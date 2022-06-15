@@ -10,7 +10,7 @@ import (
 func TestAddVertexOK(t *testing.T) {
 	for i := 0; i <= graph.AdjacencyMatrixType; i++ {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
-			var g graph.Type[int]
+			var g graph.Graph[int]
 			switch i {
 			case graph.ArcsListType:
 				g = &graph.ArcsList[int]{}
@@ -31,7 +31,7 @@ func TestAddVertexOK(t *testing.T) {
 func TestAddVertexKO(t *testing.T) {
 	for i := 0; i <= graph.AdjacencyMatrixType; i++ {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
-			var g graph.Type[int]
+			var g graph.Graph[int]
 			switch i {
 			case graph.ArcsListType:
 				g = &graph.ArcsList[int]{}
@@ -53,7 +53,7 @@ func TestAddVertexKO(t *testing.T) {
 func TestAddEdgeOK(t *testing.T) {
 	for i := 0; i <= graph.AdjacencyMatrixType; i++ {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
-			var g graph.Type[int]
+			var g graph.Graph[int]
 			switch i {
 			case graph.ArcsListType:
 				g = &graph.ArcsList[int]{}
@@ -77,7 +77,7 @@ func TestAddEdgeOK(t *testing.T) {
 func TestAddEdgeKO(t *testing.T) {
 	for i := 0; i <= graph.AdjacencyMatrixType; i++ {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
-			var g graph.Type[int]
+			var g graph.Graph[int]
 			switch i {
 			case graph.ArcsListType:
 				g = &graph.ArcsList[int]{}
@@ -102,7 +102,7 @@ func TestAddEdgeKO(t *testing.T) {
 func TestRemoveVertexOK(t *testing.T) {
 	for i := 0; i <= graph.AdjacencyMatrixType; i++ {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
-			var g graph.Type[int]
+			var g graph.Graph[int]
 			switch i {
 			case graph.ArcsListType:
 				g = &graph.ArcsList[int]{}
@@ -126,7 +126,7 @@ func TestRemoveVertexOK(t *testing.T) {
 func TestRemoveVertexKO(t *testing.T) {
 	for i := 0; i <= graph.AdjacencyMatrixType; i++ {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
-			var g graph.Type[int]
+			var g graph.Graph[int]
 			switch i {
 			case graph.ArcsListType:
 				g = &graph.ArcsList[int]{}
@@ -148,7 +148,7 @@ func TestRemoveVertexKO(t *testing.T) {
 func TestRemoveEdgeOK(t *testing.T) {
 	for i := 0; i <= graph.AdjacencyMatrixType; i++ {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
-			var g graph.Type[int]
+			var g graph.Graph[int]
 			switch i {
 			case graph.ArcsListType:
 				g = &graph.ArcsList[int]{}
@@ -173,7 +173,7 @@ func TestRemoveEdgeOK(t *testing.T) {
 func TestRemoveMultipleEdgeOK(t *testing.T) {
 	for i := 0; i <= graph.AdjacencyMatrixType; i++ {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
-			var g graph.Type[int]
+			var g graph.Graph[int]
 			switch i {
 			case graph.ArcsListType:
 				g = &graph.ArcsList[int]{}
@@ -211,7 +211,7 @@ func TestRemoveMultipleEdgeOK(t *testing.T) {
 func TestRemomveEdgeKO(t *testing.T) {
 	for i := 0; i <= graph.AdjacencyMatrixType; i++ {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
-			var g graph.Type[int]
+			var g graph.Graph[int]
 			switch i {
 			case graph.ArcsListType:
 				g = &graph.ArcsList[int]{}
