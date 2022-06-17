@@ -7,6 +7,8 @@ type Graph[T comparable] interface {
 	Degree(n *Vertex[T]) int
 	AdjacentNodes(n *Vertex[T]) []*Vertex[T]
 
+	Vertices() []*Vertex[T]
+	Edges() []*Edge[T]
 	AddVertex(v *Vertex[T])
 	RemoveVertex(v *Vertex[T])
 	ContainsVertex(v *Vertex[T]) bool

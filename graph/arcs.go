@@ -4,12 +4,14 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"log"
+	"strconv"
 	"strings"
 )
 
 type ArcsList[T comparable] struct {
-	v []Vertex[T]
-	e []Edge[T]
+	v []*Vertex[T]
+	e []*Edge[T]
 }
 
 func NewArcsList(r io.Reader) *ArcsList[string] {
@@ -27,13 +29,17 @@ func NewArcsList(r io.Reader) *ArcsList[string] {
 			vMap[f[1]] = &Vertex[string]{E: f[1]}
 			g.AddVertex(vMap[f[1]])
 		}
-		g.AddEdge(&Edge[string]{X: vMap[f[0]], Y: vMap[f[1]]})
+		d, err := strconv.Atoi(f[2])
+		if err != nil {
+			log.Fatal(err)
+		}
+		g.AddEdge(&Edge[string]{X: vMap[f[0]], Y: vMap[f[1]], P: EdgeProperty{W: d}})
 	}
 	return &g
 }
 
 func (g *ArcsList[T]) AddVertex(v *Vertex[T]) {
-	g.v = append(g.v, *v)
+	g.v = append(g.v, v)
 }
 
 func (g *ArcsList[T]) RemoveVertex(v *Vertex[T]) {
@@ -61,7 +67,7 @@ func (g ArcsList[T]) ContainsVertex(v *Vertex[T]) bool {
 }
 
 func (g *ArcsList[T]) AddEdge(e *Edge[T]) {
-	g.e = append(g.e, *e)
+	g.e = append(g.e, e)
 }
 
 func (g *ArcsList[T]) RemoveEdge(e *Edge[T]) {
@@ -131,6 +137,9 @@ func (g ArcsList[T]) AdjacentNodes(n *Vertex[T]) []*Vertex[T] {
 	}
 	return nodes
 }
+
+func (g ArcsList[T]) Vertices() []*Vertex[T] { return g.v }
+func (g ArcsList[T]) Edges() []*Edge[T]      { return g.e }
 
 func (g ArcsList[T]) String() string {
 	var e []string

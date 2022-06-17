@@ -8,7 +8,7 @@ import (
 )
 
 type AdjacencyList[T comparable] struct {
-	v Vertex[T]
+	v *Vertex[T]
 	l []*Vertex[T]
 }
 
@@ -30,13 +30,13 @@ func NewAdjacencyList(r io.Reader) *AdjacencyLists[string] {
 		l := s.Text()
 		f := strings.Split(l, ",")
 		if _, ok := lMap[f[0]]; !ok {
-			lMap[f[0]] = &AdjacencyList[string]{v: Vertex[string]{E: f[0]}}
+			lMap[f[0]] = &AdjacencyList[string]{v: &Vertex[string]{E: f[0]}}
 		}
 		if _, ok := lMap[f[1]]; !ok {
-			lMap[f[1]] = &AdjacencyList[string]{v: Vertex[string]{E: f[1]}}
+			lMap[f[1]] = &AdjacencyList[string]{v: &Vertex[string]{E: f[1]}}
 		}
-		lMap[f[0]].l = append(lMap[f[0]].l, &lMap[f[1]].v)
-		lMap[f[1]].l = append(lMap[f[1]].l, &lMap[f[0]].v)
+		lMap[f[0]].l = append(lMap[f[0]].l, lMap[f[1]].v)
+		lMap[f[1]].l = append(lMap[f[1]].l, lMap[f[0]].v)
 	}
 	for _, v := range lMap {
 		g = append(g, *v)
@@ -45,7 +45,7 @@ func NewAdjacencyList(r io.Reader) *AdjacencyLists[string] {
 }
 
 func (g *AdjacencyLists[T]) AddVertex(v *Vertex[T]) {
-	*g = append(*g, AdjacencyList[T]{v: *v})
+	*g = append(*g, AdjacencyList[T]{v: v})
 }
 
 func (g *AdjacencyLists[T]) RemoveVertex(v *Vertex[T]) {
@@ -172,4 +172,26 @@ func (g *AdjacencyLists[T]) AdjacentNodes(n *Vertex[T]) []*Vertex[T] {
 		return list.l
 	}
 	return nil
+}
+
+func (g *AdjacencyLists[T]) Vertices() []*Vertex[T] {
+	var vertices []*Vertex[T]
+	for _, v := range *g {
+		vertices = append(vertices, v.v)
+	}
+	return vertices
+}
+
+func (g *AdjacencyLists[T]) Edges() []*Edge[T] {
+	var edges []*Edge[T]
+	for _, v := range *g {
+		for _, u := range v.l {
+			e := &Edge[T]{X: v.v, Y: u}
+			if g.ContainsEdge(e) {
+				continue
+			}
+			edges = append(edges, e)
+		}
+	}
+	return edges
 }

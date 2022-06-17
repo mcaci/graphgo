@@ -214,6 +214,24 @@ func (g *AdjacencyMatrix[T]) AdjacentNodes(n *Vertex[T]) []*Vertex[T] {
 	return nodes
 }
 
+func (g AdjacencyMatrix[T]) Vertices() []*Vertex[T] {
+	return g.v
+}
+
+func (g AdjacencyMatrix[T]) Edges() []*Edge[T] {
+	var edges []*Edge[T]
+	for i := range g.m {
+		for j := range g.m[i] {
+			e := &Edge[T]{X: g.v[i], Y: g.v[j]}
+			if g.ContainsEdge(e) {
+				continue
+			}
+			edges = append(edges, e)
+		}
+	}
+	return edges
+}
+
 func (g AdjacencyMatrix[T]) String() string {
 	return fmt.Sprintf("(m:%v, v:%v)", g.m, g.v)
 }
