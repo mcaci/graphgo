@@ -64,7 +64,7 @@ var TicketToRideUSA = []string{
 	"Pittsburgh,Raleigh,2",
 	"Pittsburgh,Nashville,4",
 	"Raleigh,Nashville,3",
-	"Saint Louis,Nashville,3",
+	"Saint Louis,Nashville,2",
 	"Raleigh,Charleston,2",
 	"Atlanta,Charleston,2",
 	"Miami,Charleston,4",
