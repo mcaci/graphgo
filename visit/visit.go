@@ -8,17 +8,18 @@ func Generic[T comparable](g graph.Graph[T], s *graph.Vertex[T]) *Tree[T] {
 	if !g.ContainsVertex(s) {
 		return nil
 	}
-	t := &Tree[T]{element: &s.E}
-	vert := g.Vertices()
-	for i := range vert {
-		if vert[i].E != s.E {
-			continue
+	func(g graph.Graph[T], s *graph.Vertex[T]) *graph.Vertex[T] {
+		vert := g.Vertices()
+		for i := range vert {
+			if vert[i].E != s.E {
+				continue
+			}
+			return vert[i]
 		}
-		vert[i].SetVisited()
-		break
-	}
-	var f []graph.Vertex[T]
-	f = append(f, *s)
+		return nil
+	}(g, s).SetVisited()
+	t := &Tree[T]{element: &s.E}
+	f := []graph.Vertex[T]{*s}
 	for len(f) != 0 {
 		var u *graph.Vertex[T]
 		u, f = &f[0], f[1:]

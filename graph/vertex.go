@@ -8,6 +8,7 @@ type Vertex[T comparable] struct {
 }
 
 func (v *Vertex[T]) SetVisited()     { v.visited = true }
+func (v *Vertex[T]) ResetVisited()   { v.visited = false }
 func (v *Vertex[T]) IsVisited() bool { return v.visited }
 
 func (v Vertex[T]) String() string {
