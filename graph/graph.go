@@ -25,8 +25,21 @@ const (
 	// IncidenceMatrixType
 )
 
-func Create[T comparable](t int, r io.Reader) Graph[string] {
-	switch t {
+func New[T comparable](graphType int) Graph[T] {
+	switch graphType {
+	case ArcsListType:
+		return &ArcsList[T]{}
+	case AdjacencyListType:
+		return &AdjacencyLists[T]{}
+	case AdjacencyMatrixType:
+		return &AdjacencyMatrix[T]{}
+	default:
+		return &ArcsList[T]{}
+	}
+}
+
+func Create(graphType int, r io.Reader) Graph[string] {
+	switch graphType {
 	case ArcsListType:
 		return NewArcsList(r)
 	case AdjacencyListType:

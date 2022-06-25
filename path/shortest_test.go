@@ -36,7 +36,7 @@ func TestPathOf2Nodes(t *testing.T) {
 }
 
 func TestPathInTicketToRide(t *testing.T) {
-	g := graph.Create[string](graph.ArcsListType, strings.NewReader(strings.Join(internal.TicketToRideUSA, "\n")))
+	g := graph.Create(graph.ArcsListType, strings.NewReader(strings.Join(internal.TicketToRideUSA, "\n")))
 	vs := g.Vertices()
 	var v1, v2 *graph.Vertex[string]
 	for i := range vs {

@@ -9,7 +9,7 @@ import (
 	"github.com/mcaci/graphgo/mst/internal"
 )
 
-func testKruskalWith1Node(t *testing.T) {
+func TestKruskalWith1Node(t *testing.T) {
 	v := &graph.Vertex[int]{E: 1}
 	g := &graph.ArcsList[int]{}
 	g.AddVertex(v)
@@ -19,7 +19,7 @@ func testKruskalWith1Node(t *testing.T) {
 	}
 }
 
-func testKruskalWith3Nodes3Arcs(t *testing.T) {
+func TestKruskalWith3Nodes3Arcs(t *testing.T) {
 	v1 := &graph.Vertex[int]{E: 1}
 	v2 := &graph.Vertex[int]{E: 2}
 	v3 := &graph.Vertex[int]{E: 3}
@@ -40,14 +40,12 @@ func testKruskalWith3Nodes3Arcs(t *testing.T) {
 }
 
 func TestTicketToRideUSA(t *testing.T) {
-	g := graph.Create[string](graph.ArcsListType, strings.NewReader(strings.Join(internal.TicketToRideUSA, "\n")))
+	g := graph.Create(graph.ArcsListType, strings.NewReader(strings.Join(internal.TicketToRideUSA, "\n")))
 	tree := mst.Kruskal(g)
 	var cost int
 	for _, e := range tree.Edges() {
-		t.Log(e.P.W, e.X, e.Y)
 		cost += e.P.W
 	}
-	t.Log(cost)
 	if len(tree.Vertices()) != len(g.Vertices()) {
 		t.Fatalf("could not compute correct tree, result is %v", tree.Edges())
 	}
