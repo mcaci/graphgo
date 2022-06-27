@@ -15,6 +15,15 @@ func NewAdjacencyList(r io.Reader) *AdjacencyLists[string] {
 	var g AdjacencyLists[string]
 	s := bufio.NewScanner(r)
 	lMap := make(map[string]*AdjacencyList[string])
+	newNeighbour := func(l *AdjacencyList[string], w string) *Neighbour[string] {
+		n := &Neighbour[string]{v: l.v}
+		wInt, err := strconv.Atoi(w)
+		if err != nil {
+			log.Panic(err)
+		}
+		n.p = EdgeProperty{W: wInt}
+		return n
+	}
 	for s.Scan() {
 		l := s.Text()
 		f := strings.Split(l, ",")
@@ -24,24 +33,12 @@ func NewAdjacencyList(r io.Reader) *AdjacencyLists[string] {
 		if _, ok := lMap[f[1]]; !ok {
 			lMap[f[1]] = &AdjacencyList[string]{v: &Vertex[string]{E: f[1]}}
 		}
-		n0 := &Neighbour[string]{v: lMap[f[1]].v}
+		var w string
 		if len(f) >= 3 {
-			w, err := strconv.Atoi(f[2])
-			if err != nil {
-				log.Panic(err)
-			}
-			n0.p = EdgeProperty{W: w}
+			w = f[2]
 		}
-		lMap[f[0]].n = append(lMap[f[0]].n, n0)
-		n1 := &Neighbour[string]{v: lMap[f[0]].v}
-		if len(f) >= 3 {
-			w, err := strconv.Atoi(f[2])
-			if err != nil {
-				log.Panic(err)
-			}
-			n0.p = EdgeProperty{W: w}
-		}
-		lMap[f[1]].n = append(lMap[f[1]].n, n1)
+		lMap[f[0]].n = append(lMap[f[0]].n, newNeighbour(lMap[f[1]], w))
+		lMap[f[1]].n = append(lMap[f[1]].n, newNeighbour(lMap[f[0]], w))
 	}
 	for _, v := range lMap {
 		g = append(g, *v)
