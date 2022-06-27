@@ -13,7 +13,7 @@ func TestGraphCreationOK(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			for i := 0; i <= graph.AdjacencyMatrixType; i++ {
 				t.Run(strconv.Itoa(i), func(t *testing.T) {
-					g := graph.Create(i, strings.NewReader(strings.Join(tc.edges, "\n")))
+					g := graph.NewWithReader(i, strings.NewReader(strings.Join(tc.edges, "\n")))
 					if !g.AreAdjacent(&tc.a, &tc.b) {
 						t.Fatalf("expecting %v to contain (%v,%v)", g, tc.a, tc.b)
 					}
@@ -28,7 +28,7 @@ func TestGraphDegreeOK(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			for i := 0; i <= graph.AdjacencyMatrixType; i++ {
 				t.Run(strconv.Itoa(i), func(t *testing.T) {
-					g := graph.Create(i, strings.NewReader(strings.Join(tc.edges, "\n")))
+					g := graph.NewWithReader(i, strings.NewReader(strings.Join(tc.edges, "\n")))
 					if d := g.Degree(&tc.a); d != tc.degree {
 						t.Fatalf("expecting node %v from graph %v to have degree %v but was %v", tc.a, g, tc.degree, d)
 					}
@@ -43,7 +43,7 @@ func TestAdjNodesOK(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			for i := 0; i <= graph.AdjacencyMatrixType; i++ {
 				t.Run(strconv.Itoa(i), func(t *testing.T) {
-					g := graph.Create(i, strings.NewReader(strings.Join(tc.edges, "\n")))
+					g := graph.NewWithReader(i, strings.NewReader(strings.Join(tc.edges, "\n")))
 					nodes := g.AdjacentNodes(&tc.a)
 					for _, tcn := range tc.adjNodes {
 						var found bool

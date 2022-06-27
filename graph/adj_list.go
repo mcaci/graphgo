@@ -1,85 +1,37 @@
 package graph
 
 import (
-	"bufio"
 	"fmt"
-	"io"
-	"log"
-	"strconv"
 	"strings"
 )
 
 type AdjacencyLists[T comparable] []AdjacencyList[T]
 
-func NewAdjacencyList(r io.Reader) *AdjacencyLists[string] {
-	var g AdjacencyLists[string]
-	s := bufio.NewScanner(r)
-	lMap := make(map[string]*AdjacencyList[string])
-	newNeighbour := func(l *AdjacencyList[string], w string) *Neighbour[string] {
-		n := &Neighbour[string]{v: l.v}
-		wInt, err := strconv.Atoi(w)
-		if err != nil {
-			log.Panic(err)
-		}
-		n.p = EdgeProperty{W: wInt}
-		return n
-	}
-	for s.Scan() {
-		l := s.Text()
-		f := strings.Split(l, ",")
-		if _, ok := lMap[f[0]]; !ok {
-			lMap[f[0]] = &AdjacencyList[string]{v: &Vertex[string]{E: f[0]}}
-		}
-		if _, ok := lMap[f[1]]; !ok {
-			lMap[f[1]] = &AdjacencyList[string]{v: &Vertex[string]{E: f[1]}}
-		}
-		var w string
-		if len(f) >= 3 {
-			w = f[2]
-		}
-		lMap[f[0]].n = append(lMap[f[0]].n, newNeighbour(lMap[f[1]], w))
-		lMap[f[1]].n = append(lMap[f[1]].n, newNeighbour(lMap[f[0]], w))
-	}
-	for _, v := range lMap {
-		g = append(g, *v)
-	}
-	return &g
-}
-
 func (g *AdjacencyLists[T]) AddVertex(v *Vertex[T]) {
+	if g.ContainsVertex(v) {
+		return
+	}
 	*g = append(*g, AdjacencyList[T]{v: v})
 }
 
 func (g *AdjacencyLists[T]) RemoveVertex(v *Vertex[T]) {
-	id := -1
-	for i, gv := range *g {
-		if gv.v.E != v.E {
-			continue
-		}
-		id = i
-	}
-	if id < 0 {
+	i, _, err := getVertex[T](g, v)
+	if err != nil {
 		return
 	}
-	*g = append((*g)[:id], (*g)[id+1:]...)
+	*g = append((*g)[:i], (*g)[i+1:]...)
 }
 
 func (g AdjacencyLists[T]) ContainsVertex(v *Vertex[T]) bool {
-	for _, gv := range g {
-		if gv.v.E != v.E {
-			continue
-		}
-		return true
-	}
-	return false
+	_, _, err := getVertex[T](&g, v)
+	return err == nil
 }
 
 func (g *AdjacencyLists[T]) AddEdge(e *Edge[T]) {
+	if g.ContainsEdge(e) {
+		return
+	}
 	add := func(x, y *Vertex[T]) {
-		if !g.ContainsVertex(x) {
-			g.AddVertex(x)
-			return
-		}
 		for i, gv := range *g {
 			if gv.v.E != x.E {
 				continue
@@ -97,12 +49,12 @@ func (g *AdjacencyLists[T]) RemoveEdge(e *Edge[T]) {
 		if !g.ContainsVertex(x) {
 			return
 		}
-		for i, gv := range *g {
-			if gv.v.E != x.E {
+		for i, l := range *g {
+			if l.v.E != x.E {
 				continue
 			}
-			for j, lv := range gv.n {
-				if lv.v.E != y.E {
+			for j, nv := range l.n {
+				if nv.v.E != y.E {
 					continue
 				}
 				(*g)[i].n = append((*g)[i].n[:j], (*g)[i].n[j+1:]...)
@@ -115,25 +67,9 @@ func (g *AdjacencyLists[T]) RemoveEdge(e *Edge[T]) {
 }
 
 func (g AdjacencyLists[T]) ContainsEdge(e *Edge[T]) bool {
-	has := func(x, y *Vertex[T]) bool {
-		if !g.ContainsVertex(x) {
-			return false
-		}
-		for _, gv := range g {
-			if gv.v.E != x.E {
-				continue
-			}
-			for _, lv := range gv.n {
-				if lv.v.E != y.E {
-					continue
-				}
-				return true
-			}
-			return false
-		}
-		return false
-	}
-	return has(e.X, e.Y) //&& has(e.Y, e.X)
+	_, _, err := getEdge[T](&g, e)
+	// _, _, othererr := getEdge[T](&g, e.Y.E, e.X.E)
+	return err == nil // && othererr != nil
 }
 
 func (g *AdjacencyLists[T]) AreAdjacent(a, b *Vertex[T]) bool {

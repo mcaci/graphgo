@@ -2,57 +2,18 @@ package graph
 
 import (
 	"fmt"
-	"io"
 )
 
 type AdjacencyMatrix[T comparable] struct {
-	m [][]bool
+	m [][]*EdgeProperty
 	v []*Vertex[T]
-}
-
-func NewAdjacencyMatrix(r io.Reader) *AdjacencyMatrix[string] {
-	edges := NewArcsList(r)
-	nMap := make(map[string]struct{})
-	for _, e := range edges.e {
-		nMap[e.X.E] = struct{}{}
-		nMap[e.Y.E] = struct{}{}
-	}
-	var mat [][]bool
-	var nodes []*Vertex[string]
-	for n := range nMap {
-		mat = append(mat, make([]bool, len(nMap)))
-		nodes = append(nodes, &Vertex[string]{E: n})
-	}
-	for _, e := range edges.e {
-		var i, j int
-		for k := range nodes {
-			if nodes[k].E != e.X.E {
-				continue
-			}
-			i = k
-			break
-		}
-		for k := range nodes {
-			if nodes[k].E != e.Y.E {
-				continue
-			}
-			j = k
-			break
-		}
-		mat[i][j] = true
-		mat[j][i] = true
-	}
-	return &AdjacencyMatrix[string]{
-		m: mat,
-		v: nodes,
-	}
 }
 
 func (g *AdjacencyMatrix[T]) AddVertex(v *Vertex[T]) {
 	g.v = append(g.v, v)
-	g.m = append(g.m, make([]bool, len(g.m)))
+	g.m = append(g.m, make([]*EdgeProperty, len(g.m)))
 	for i := range g.m {
-		g.m[i] = append(g.m[i], false)
+		g.m[i] = append(g.m[i], nil)
 	}
 }
 
@@ -69,9 +30,9 @@ func (g *AdjacencyMatrix[T]) RemoveVertex(v *Vertex[T]) {
 		break
 	}
 	g.v = append(g.v[:id], g.v[id+1:]...)
-	mat := make([][]bool, len(g.m)-1)
+	mat := make([][]*EdgeProperty, len(g.m)-1)
 	for i := range mat {
-		mat[i] = append(mat[i], make([]bool, len(g.m)-1)...)
+		mat[i] = append(mat[i], make([]*EdgeProperty, len(g.m)-1)...)
 	}
 	for i := range g.m {
 		if i == id {
@@ -96,13 +57,8 @@ func (g *AdjacencyMatrix[T]) RemoveVertex(v *Vertex[T]) {
 }
 
 func (g AdjacencyMatrix[T]) ContainsVertex(v *Vertex[T]) bool {
-	for _, gv := range g.v {
-		if gv.E != v.E {
-			continue
-		}
-		return true
-	}
-	return false
+	_, _, err := getVertex[T](&g, v)
+	return err == nil
 }
 
 func (g *AdjacencyMatrix[T]) AddEdge(e *Edge[T]) {
@@ -122,7 +78,8 @@ func (g *AdjacencyMatrix[T]) AddEdge(e *Edge[T]) {
 			iy = i
 		}
 	}
-	g.m[ix][iy] = true
+	g.m[ix][iy] = &e.P
+	g.m[iy][ix] = &e.P
 }
 
 func (g *AdjacencyMatrix[T]) RemoveEdge(e *Edge[T]) {
@@ -139,7 +96,7 @@ func (g *AdjacencyMatrix[T]) RemoveEdge(e *Edge[T]) {
 			iy = i
 		}
 	}
-	g.m[ix][iy] = false
+	g.m[ix][iy] = nil
 }
 
 func (g AdjacencyMatrix[T]) ContainsEdge(e *Edge[T]) bool {
@@ -156,7 +113,7 @@ func (g AdjacencyMatrix[T]) ContainsEdge(e *Edge[T]) bool {
 			iy = i
 		}
 	}
-	return g.m[ix][iy]
+	return g.m[ix][iy] != nil
 }
 
 func (g *AdjacencyMatrix[T]) AreAdjacent(a, b *Vertex[T]) bool {
@@ -175,7 +132,7 @@ func (g *AdjacencyMatrix[T]) AreAdjacent(a, b *Vertex[T]) bool {
 		j = k
 		break
 	}
-	return g.m[i][j]
+	return g.m[i][j] != nil
 }
 
 func (g *AdjacencyMatrix[T]) Degree(n *Vertex[T]) int {
@@ -188,7 +145,7 @@ func (g *AdjacencyMatrix[T]) Degree(n *Vertex[T]) int {
 	}
 	var d int
 	for j := range g.m[i] {
-		if !g.m[i][j] {
+		if g.m[i][j] == nil {
 			continue
 		}
 		d++
@@ -207,9 +164,10 @@ func (g *AdjacencyMatrix[T]) AdjacentNodes(n *Vertex[T]) []*Vertex[T] {
 	}
 	var nodes []*Vertex[T]
 	for j, arc := range g.m[idx] {
-		if arc {
-			nodes = append(nodes, g.v[j])
+		if arc == nil {
+			continue
 		}
+		nodes = append(nodes, g.v[j])
 	}
 	return nodes
 }
@@ -222,11 +180,10 @@ func (g AdjacencyMatrix[T]) Edges() []*Edge[T] {
 	var edges []*Edge[T]
 	for i := range g.m {
 		for j := range g.m[i] {
-			e := &Edge[T]{X: g.v[i], Y: g.v[j]}
-			if g.ContainsEdge(e) {
+			if g.m[i][j] == nil {
 				continue
 			}
-			edges = append(edges, e)
+			edges = append(edges, &Edge[T]{X: g.v[i], Y: g.v[j], P: *g.m[i][j]})
 		}
 	}
 	return edges
