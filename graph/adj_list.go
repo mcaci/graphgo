@@ -4,21 +4,10 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"log"
+	"strconv"
 	"strings"
 )
-
-type AdjacencyList[T comparable] struct {
-	v *Vertex[T]
-	l []*Vertex[T]
-}
-
-func (g AdjacencyList[T]) String() string {
-	var s []string
-	for _, a := range g.l {
-		s = append(s, a.String())
-	}
-	return fmt.Sprintf("(v:%v, l:%v)", g.v, strings.Join(s, ","))
-}
 
 type AdjacencyLists[T comparable] []AdjacencyList[T]
 
@@ -35,8 +24,24 @@ func NewAdjacencyList(r io.Reader) *AdjacencyLists[string] {
 		if _, ok := lMap[f[1]]; !ok {
 			lMap[f[1]] = &AdjacencyList[string]{v: &Vertex[string]{E: f[1]}}
 		}
-		lMap[f[0]].l = append(lMap[f[0]].l, lMap[f[1]].v)
-		lMap[f[1]].l = append(lMap[f[1]].l, lMap[f[0]].v)
+		n0 := &Neighbour[string]{v: lMap[f[1]].v}
+		if len(f) >= 3 {
+			w, err := strconv.Atoi(f[2])
+			if err != nil {
+				log.Panic(err)
+			}
+			n0.p = EdgeProperty{W: w}
+		}
+		lMap[f[0]].n = append(lMap[f[0]].n, n0)
+		n1 := &Neighbour[string]{v: lMap[f[0]].v}
+		if len(f) >= 3 {
+			w, err := strconv.Atoi(f[2])
+			if err != nil {
+				log.Panic(err)
+			}
+			n0.p = EdgeProperty{W: w}
+		}
+		lMap[f[1]].n = append(lMap[f[1]].n, n1)
 	}
 	for _, v := range lMap {
 		g = append(g, *v)
@@ -82,7 +87,7 @@ func (g *AdjacencyLists[T]) AddEdge(e *Edge[T]) {
 			if gv.v.E != x.E {
 				continue
 			}
-			(*g)[i].l = append((*g)[i].l, y)
+			(*g)[i].n = append((*g)[i].n, &Neighbour[T]{v: y, p: e.P})
 			return
 		}
 	}
@@ -99,11 +104,11 @@ func (g *AdjacencyLists[T]) RemoveEdge(e *Edge[T]) {
 			if gv.v.E != x.E {
 				continue
 			}
-			for j, lv := range gv.l {
-				if lv.E != y.E {
+			for j, lv := range gv.n {
+				if lv.v.E != y.E {
 					continue
 				}
-				(*g)[i].l = append((*g)[i].l[:j], (*g)[i].l[j+1:]...)
+				(*g)[i].n = append((*g)[i].n[:j], (*g)[i].n[j+1:]...)
 				return
 			}
 		}
@@ -121,8 +126,8 @@ func (g AdjacencyLists[T]) ContainsEdge(e *Edge[T]) bool {
 			if gv.v.E != x.E {
 				continue
 			}
-			for _, lv := range gv.l {
-				if lv.E != y.E {
+			for _, lv := range gv.n {
+				if lv.v.E != y.E {
 					continue
 				}
 				return true
@@ -137,15 +142,15 @@ func (g AdjacencyLists[T]) ContainsEdge(e *Edge[T]) bool {
 func (g *AdjacencyLists[T]) AreAdjacent(a, b *Vertex[T]) bool {
 	for _, l := range *g {
 		if l.v.E == a.E {
-			for j := range l.l {
-				if l.l[j].E == b.E {
+			for j := range l.n {
+				if l.n[j].v.E == b.E {
 					return true
 				}
 			}
 		}
 		if l.v.E == b.E {
-			for j := range l.l {
-				if l.l[j].E == a.E {
+			for j := range l.n {
+				if l.n[j].v.E == a.E {
 					return true
 				}
 			}
@@ -159,19 +164,25 @@ func (g *AdjacencyLists[T]) Degree(n *Vertex[T]) int {
 		if node.v.E != n.E {
 			continue
 		}
-		return len(node.l)
+		return len(node.n)
 	}
 	return 0
 }
 
 func (g *AdjacencyLists[T]) AdjacentNodes(n *Vertex[T]) []*Vertex[T] {
+	var nghrs []*Neighbour[T]
 	for _, list := range *g {
 		if list.v.E != n.E {
 			continue
 		}
-		return list.l
+		nghrs = list.n
+		break
 	}
-	return nil
+	var l []*Vertex[T]
+	for _, n := range nghrs {
+		l = append(l, n.v)
+	}
+	return l
 }
 
 func (g *AdjacencyLists[T]) Vertices() []*Vertex[T] {
@@ -185,13 +196,31 @@ func (g *AdjacencyLists[T]) Vertices() []*Vertex[T] {
 func (g *AdjacencyLists[T]) Edges() []*Edge[T] {
 	var edges []*Edge[T]
 	for _, v := range *g {
-		for _, u := range v.l {
-			e := &Edge[T]{X: v.v, Y: u}
-			if g.ContainsEdge(e) {
-				continue
-			}
-			edges = append(edges, e)
+		for _, u := range v.n {
+			edges = append(edges, &Edge[T]{X: v.v, Y: u.v, P: u.p})
 		}
 	}
 	return edges
+}
+
+type AdjacencyList[T comparable] struct {
+	v *Vertex[T]
+	n []*Neighbour[T]
+}
+
+func (g AdjacencyList[T]) String() string {
+	var s []string
+	for _, v := range g.n {
+		s = append(s, v.String())
+	}
+	return fmt.Sprintf("(v:%v, l:%v)", g.v, strings.Join(s, ","))
+}
+
+type Neighbour[T comparable] struct {
+	v *Vertex[T]
+	p EdgeProperty
+}
+
+func (n Neighbour[T]) String() string {
+	return fmt.Sprintf("(v:%v, p:%v)", n.v, n.p)
 }
