@@ -82,7 +82,7 @@ func TestGenericVisit(t *testing.T) {
 
 func TestTicketToRideUSA(t *testing.T) {
 	for i := 0; i <= graph.AdjacencyMatrixType; i++ {
-		g := graph.Create(i, strings.NewReader(strings.Join(internal.TicketToRideUSA, "\n")))
+		g := graph.NewWithReader(i, strings.NewReader(strings.Join(internal.TicketToRideUSA, "\n")))
 		tree := visit.Generic(g, &graph.Vertex[string]{E: "Chicago"})
 		if tree.Size() != len(g.Vertices()) {
 			t.Fatalf("could not compute correct tree, result is %v", tree)
