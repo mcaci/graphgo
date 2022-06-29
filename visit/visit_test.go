@@ -2,12 +2,10 @@ package visit_test
 
 import (
 	"strconv"
-	"strings"
 	"testing"
 
 	"github.com/mcaci/graphgo/graph"
 	"github.com/mcaci/graphgo/visit"
-	"github.com/mcaci/graphgo/visit/internal"
 )
 
 func TestGenericVisit(t *testing.T) {
@@ -76,23 +74,6 @@ func TestGenericVisit(t *testing.T) {
 					t.Fatalf("could not compute correct tree, result is %v", tree)
 				}
 			})
-		}
-	}
-}
-
-func TestTicketToRideUSA(t *testing.T) {
-	for i := 0; i <= graph.AdjacencyMatrixType; i++ {
-		g := graph.NewWithReader(i, strings.NewReader(strings.Join(internal.TicketToRideUSA, "\n")))
-		tree := visit.Generic(g, &graph.Vertex[string]{E: "Chicago"})
-		if tree.Size() != len(g.Vertices()) {
-			t.Fatalf("could not compute correct tree, result is %v", tree)
-		}
-		for _, v := range g.Vertices() {
-			v.ResetVisited()
-		}
-		if !visit.Connected(g) {
-			t.Log(len(g.Vertices()), visit.Generic(g, g.Vertices()[0]).Size())
-			t.Fatalf("ticket to ride board should be connected but was not; graph: %v", g)
 		}
 	}
 }

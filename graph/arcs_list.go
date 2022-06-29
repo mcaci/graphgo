@@ -22,8 +22,8 @@ func (g *ArcsList[T]) RemoveVertex(v *Vertex[T]) {
 	g.v = append(g.v[:i], g.v[i+1:]...)
 }
 
-func (g ArcsList[T]) ContainsVertex(v *Vertex[T]) bool {
-	_, _, err := getVertex[T](&g, v)
+func (g *ArcsList[T]) ContainsVertex(v *Vertex[T]) bool {
+	_, _, err := getVertex[T](g, v)
 	return err == nil
 }
 
@@ -39,49 +39,45 @@ func (g *ArcsList[T]) RemoveEdge(e *Edge[T]) {
 	g.e = append(g.e[:i], g.e[i+1:]...)
 }
 
-func (g ArcsList[T]) ContainsEdge(e *Edge[T]) bool {
-	_, _, err := getEdge[T](&g, e)
+func (g *ArcsList[T]) ContainsEdge(e *Edge[T]) bool {
+	_, _, err := getEdge[T](g, e)
 	return err == nil
 }
 
-func (g ArcsList[T]) AreAdjacent(a, b *Vertex[T]) bool {
-	for i := range g.e {
-		e := g.e[i]
-		switch {
-		case e.X.E == a.E && e.Y.E == b.E,
-			e.X.E == b.E && e.Y.E == a.E:
-			return true
-		}
+func (g *ArcsList[T]) AreAdjacent(a, b *Vertex[T]) bool {
+	_, e, err := getEdge[T](g, &Edge[T]{X: a, Y: b})
+	if err != nil {
+		return false
 	}
-	return false
+	return e != nil
 }
 
-func (g ArcsList[T]) Degree(n *Vertex[T]) int {
+func (g *ArcsList[T]) Degree(v *Vertex[T]) int {
 	var d int
-	for _, a := range g.e {
-		switch n.E {
-		case a.X.E, a.Y.E:
+	for _, e := range g.e {
+		switch v.E {
+		case e.X.E, e.Y.E:
 			d++
 		}
 	}
 	return d
 }
 
-func (g ArcsList[T]) AdjacentNodes(n *Vertex[T]) []*Vertex[T] {
+func (g *ArcsList[T]) AdjacentNodes(v *Vertex[T]) []*Vertex[T] {
 	var nodes []*Vertex[T]
-	for _, a := range g.e {
-		switch n.E {
-		case a.X.E:
-			nodes = append(nodes, a.Y)
-		case a.Y.E:
-			nodes = append(nodes, a.X)
+	for _, e := range g.e {
+		switch v.E {
+		case e.X.E:
+			nodes = append(nodes, e.Y)
+		case e.Y.E:
+			nodes = append(nodes, e.X)
 		}
 	}
 	return nodes
 }
 
-func (g ArcsList[T]) Vertices() []*Vertex[T] { return g.v }
-func (g ArcsList[T]) Edges() []*Edge[T]      { return g.e }
+func (g *ArcsList[T]) Vertices() []*Vertex[T] { return g.v }
+func (g *ArcsList[T]) Edges() []*Edge[T]      { return g.e }
 
 func (g ArcsList[T]) String() string {
 	var e []string

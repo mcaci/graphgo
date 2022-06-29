@@ -13,5 +13,5 @@ Helena SaltLakeCity 3 pink
 Seattle Portland 1 grey`
 
 func main() {
-	fmt.Printf("g: %v\n", graph.NewWithReader(graph.ArcsListType, strings.NewReader(edges)))
+	fmt.Printf("g: %v\n", graph.NewFromCSV(graph.ArcsListType, strings.NewReader(edges)))
 }

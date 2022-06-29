@@ -2,12 +2,10 @@ package path_test
 
 import (
 	"strconv"
-	"strings"
 	"testing"
 
 	"github.com/mcaci/graphgo/graph"
 	"github.com/mcaci/graphgo/path"
-	"github.com/mcaci/graphgo/path/internal"
 )
 
 func TestGenericShortestPath(t *testing.T) {
@@ -76,24 +74,5 @@ func TestGenericShortestPath(t *testing.T) {
 				}
 			})
 		}
-	}
-}
-
-func TestPathInTicketToRide(t *testing.T) {
-	g := graph.NewWithReader(graph.AdjacencyMatrixType, strings.NewReader(strings.Join(internal.TicketToRideUSA, "\n")))
-	vs := g.Vertices()
-	var v1, v2 *graph.Vertex[string]
-	for i := range vs {
-		switch vs[i].E {
-		case "Chicago":
-			v1 = vs[i]
-		case "Vancouver":
-			v2 = vs[i]
-		}
-	}
-	d := path.BellmanFordDist(g, v1)
-	p := path.Shortest(g, d, v1, v2)
-	if len(p) != 5 {
-		t.Fatalf("Expecting a path of len 5 but was %v; graph: %v", p, g)
 	}
 }

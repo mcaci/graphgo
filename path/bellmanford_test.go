@@ -2,12 +2,10 @@ package path_test
 
 import (
 	"strconv"
-	"strings"
 	"testing"
 
 	"github.com/mcaci/graphgo/graph"
 	"github.com/mcaci/graphgo/path"
-	"github.com/mcaci/graphgo/path/internal"
 )
 
 func TestGenericDistance(t *testing.T) {
@@ -75,23 +73,5 @@ func TestGenericDistance(t *testing.T) {
 				}
 			})
 		}
-	}
-}
-
-func TestDistanceInTicketToRide(t *testing.T) {
-	g := graph.NewWithReader(graph.AdjacencyMatrixType, strings.NewReader(strings.Join(internal.TicketToRideUSA, "\n")))
-	vs := g.Vertices()
-	var v1, v2 *graph.Vertex[string]
-	for i := range vs {
-		switch vs[i].E {
-		case "Chicago":
-			v1 = vs[i]
-		case "Vancouver":
-			v2 = vs[i]
-		}
-	}
-	d := path.BellmanFordDist(g, v1)
-	if dist := d[v2].Dist(); dist != 16 {
-		t.Fatalf("Expecting a distance of 16 but was %d; graph: %v", dist, g)
 	}
 }

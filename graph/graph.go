@@ -11,8 +11,8 @@ import (
 
 type Graph[T comparable] interface {
 	AreAdjacent(a, b *Vertex[T]) bool
-	Degree(n *Vertex[T]) int
-	AdjacentNodes(n *Vertex[T]) []*Vertex[T]
+	Degree(v *Vertex[T]) int
+	AdjacentNodes(v *Vertex[T]) []*Vertex[T]
 
 	Vertices() []*Vertex[T]
 	Edges() []*Edge[T]
@@ -45,7 +45,7 @@ func New[T comparable](graphType int) Graph[T] {
 	}
 }
 
-func NewWithReader(graphType int, r io.Reader) Graph[string] {
+func NewFromCSV(graphType int, r io.Reader) Graph[string] {
 	g := New[string](graphType)
 	s := bufio.NewScanner(r)
 	for s.Scan() {

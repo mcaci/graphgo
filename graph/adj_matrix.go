@@ -18,130 +18,92 @@ func (g *AdjacencyMatrix[T]) AddVertex(v *Vertex[T]) {
 }
 
 func (g *AdjacencyMatrix[T]) RemoveVertex(v *Vertex[T]) {
-	if !g.ContainsVertex(v) {
+	iRm, _, err := getVertex[T](g, v)
+	if err != nil {
 		return
 	}
-	var id int
-	for i, gv := range g.v {
-		if gv.E != v.E {
-			continue
+	g.v = append(g.v[:iRm], g.v[iRm+1:]...)
+	m := make([][]*EdgeProperty, len(g.m)-1)
+	reduce := func(i, iRm int) int {
+		if i > iRm {
+			return i - 1
 		}
-		id = i
-		break
+		return i
 	}
-	g.v = append(g.v[:id], g.v[id+1:]...)
-	mat := make([][]*EdgeProperty, len(g.m)-1)
-	for i := range mat {
-		mat[i] = append(mat[i], make([]*EdgeProperty, len(g.m)-1)...)
+	for i := range m {
+		m[i] = append(m[i], make([]*EdgeProperty, len(g.m)-1)...)
 	}
 	for i := range g.m {
-		if i == id {
+		if i == iRm {
 			continue
 		}
-		iMat := i
-		if i > id {
-			iMat = i - 1
-		}
+		mi := reduce(i, iRm)
 		for j := range g.m[i] {
-			if j == id {
+			if j == iRm {
 				continue
 			}
-			jMat := j
-			if j > id {
-				jMat = j - 1
-			}
-			mat[iMat][jMat] = g.m[i][j]
+			mj := reduce(j, iRm)
+			m[mi][mj] = g.m[i][j]
 		}
 	}
-	g.m = mat
+	g.m = m
 }
 
-func (g AdjacencyMatrix[T]) ContainsVertex(v *Vertex[T]) bool {
-	_, _, err := getVertex[T](&g, v)
+func (g *AdjacencyMatrix[T]) ContainsVertex(v *Vertex[T]) bool {
+	_, _, err := getVertex[T](g, v)
 	return err == nil
 }
 
 func (g *AdjacencyMatrix[T]) AddEdge(e *Edge[T]) {
-	if !g.ContainsVertex(e.X) {
-		g.AddVertex(e.X)
+	i, _, err := getVertex[T](g, e.X)
+	if err != nil {
+		return
 	}
-	if !g.ContainsVertex(e.Y) {
-		g.AddVertex(e.Y)
+	j, _, err := getVertex[T](g, e.Y)
+	if err != nil {
+		return
 	}
-	x, y := e.X, e.Y
-	var ix, iy int
-	for i, gv := range g.v {
-		switch gv.E {
-		case x.E:
-			ix = i
-		case y.E:
-			iy = i
-		}
-	}
-	g.m[ix][iy] = &e.P
-	g.m[iy][ix] = &e.P
+	g.m[i][j] = &e.P
+	g.m[j][i] = &e.P
 }
 
 func (g *AdjacencyMatrix[T]) RemoveEdge(e *Edge[T]) {
-	if !g.ContainsEdge(e) {
+	i, _, err := getVertex[T](g, e.X)
+	if err != nil {
 		return
 	}
-	x, y := e.X, e.Y
-	var ix, iy int
-	for i, gv := range g.v {
-		switch gv.E {
-		case x.E:
-			ix = i
-		case y.E:
-			iy = i
-		}
+	j, _, err := getVertex[T](g, e.Y)
+	if err != nil {
+		return
 	}
-	g.m[ix][iy] = nil
+	g.m[i][j] = nil
+	g.m[j][i] = nil
 }
 
-func (g AdjacencyMatrix[T]) ContainsEdge(e *Edge[T]) bool {
-	if !g.ContainsVertex(e.X) || !g.ContainsVertex(e.Y) {
+func (g *AdjacencyMatrix[T]) ContainsEdge(e *Edge[T]) bool {
+	i, _, err := getVertex[T](g, e.X)
+	if err != nil {
 		return false
 	}
-	x, y := e.X, e.Y
-	var ix, iy int
-	for i, gv := range g.v {
-		switch gv.E {
-		case x.E:
-			ix = i
-		case y.E:
-			iy = i
-		}
+	j, _, err := getVertex[T](g, e.Y)
+	if err != nil {
+		return false
 	}
-	return g.m[ix][iy] != nil
+	return g.m[i][j] != nil && g.m[j][i] != nil
 }
 
 func (g *AdjacencyMatrix[T]) AreAdjacent(a, b *Vertex[T]) bool {
-	var i, j int
-	for k := range g.v {
-		if g.v[k].E != a.E {
-			continue
-		}
-		i = k
-		break
+	_, e, err := getEdge[T](g, &Edge[T]{X: a, Y: b})
+	if err != nil {
+		return false
 	}
-	for k := range g.v {
-		if g.v[k].E != b.E {
-			continue
-		}
-		j = k
-		break
-	}
-	return g.m[i][j] != nil
+	return e != nil
 }
 
-func (g *AdjacencyMatrix[T]) Degree(n *Vertex[T]) int {
-	var i int
-	for index, node := range g.v {
-		if node.E != n.E {
-			continue
-		}
-		i = index
+func (g *AdjacencyMatrix[T]) Degree(v *Vertex[T]) int {
+	i, _, err := getVertex[T](g, v)
+	if err != nil {
+		return 0
 	}
 	var d int
 	for j := range g.m[i] {
@@ -153,18 +115,14 @@ func (g *AdjacencyMatrix[T]) Degree(n *Vertex[T]) int {
 	return d
 }
 
-func (g *AdjacencyMatrix[T]) AdjacentNodes(n *Vertex[T]) []*Vertex[T] {
-	var idx int
-	for i, node := range g.v {
-		if node.E != n.E {
-			continue
-		}
-		idx = i
-		break
+func (g *AdjacencyMatrix[T]) AdjacentNodes(v *Vertex[T]) []*Vertex[T] {
+	i, _, err := getVertex[T](g, v)
+	if err != nil {
+		return nil
 	}
 	var nodes []*Vertex[T]
-	for j, arc := range g.m[idx] {
-		if arc == nil {
+	for j := range g.m[i] {
+		if g.m[i][j] == nil {
 			continue
 		}
 		nodes = append(nodes, g.v[j])
@@ -172,11 +130,8 @@ func (g *AdjacencyMatrix[T]) AdjacentNodes(n *Vertex[T]) []*Vertex[T] {
 	return nodes
 }
 
-func (g AdjacencyMatrix[T]) Vertices() []*Vertex[T] {
-	return g.v
-}
-
-func (g AdjacencyMatrix[T]) Edges() []*Edge[T] {
+func (g *AdjacencyMatrix[T]) Vertices() []*Vertex[T] { return g.v }
+func (g *AdjacencyMatrix[T]) Edges() []*Edge[T] {
 	var edges []*Edge[T]
 	for i := range g.m {
 		for j := range g.m[i] {
