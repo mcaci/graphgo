@@ -51,25 +51,27 @@ func NewFromCSV(graphType int, r io.Reader) Graph[string] {
 	for s.Scan() {
 		l := s.Text()
 		f := strings.Split(l, ",")
-		_, v, err := getVertex(g, &Vertex[string]{E: f[0]})
-		if err != nil {
-			v = &Vertex[string]{E: f[0]}
-			g.AddVertex(v)
+		v1 := &Vertex[string]{E: f[0]}
+		if !g.ContainsVertex(v1) {
+			g.AddVertex(v1)
 		}
-		_, u, err := getVertex(g, &Vertex[string]{E: f[1]})
-		if err != nil {
-			u = &Vertex[string]{E: f[1]}
-			g.AddVertex(u)
+		v2 := &Vertex[string]{E: f[1]}
+		if !g.ContainsVertex(v2) {
+			g.AddVertex(v2)
 		}
-		var w int
-		if len(f) >= 3 {
-			var err error
-			w, err = strconv.Atoi(f[2])
+		e := &Edge[string]{X: v1, Y: v2}
+		if !g.ContainsEdge(e) {
+			if len(f) < 3 {
+				g.AddEdge(e)
+				continue
+			}
+			w, err := strconv.Atoi(f[2])
 			if err != nil {
 				log.Panic(err)
 			}
+			e.P = EdgeProperty{W: w}
+			g.AddEdge(e)
 		}
-		g.AddEdge(&Edge[string]{X: v, Y: u, P: EdgeProperty{W: w}})
 	}
 	return g
 }

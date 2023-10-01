@@ -16,7 +16,7 @@ var testdata = []struct {
 	adjNodes []string
 }{
 	{name: "graph with 1 edge", edges: []string{
-		"Vancouver,Seattle,1",
+		"Vancouver,Seattle",
 	},
 		a: graph.Vertex[string]{E: "Vancouver"}, b: graph.Vertex[string]{E: "Seattle"},
 		degree:   1,
