@@ -3,8 +3,9 @@ package graph
 import (
 	"bufio"
 	"errors"
+	"fmt"
+	"image/color"
 	"io"
-	"log"
 	"strconv"
 	"strings"
 )
@@ -45,35 +46,62 @@ func New[T comparable](graphType int) Graph[T] {
 	}
 }
 
-func NewFromCSV(graphType int, r io.Reader) Graph[string] {
-	g := New[string](graphType)
+func Fill[T comparable](vs []*Vertex[T], es []*Edge[T], into Graph[T]) {
+	for _, v := range vs {
+		if into.ContainsVertex(v) {
+			continue
+		}
+		into.AddVertex(v)
+	}
+	for _, e := range es {
+		if into.ContainsEdge(e) {
+			continue
+		}
+		into.AddEdge(e)
+	}
+}
+
+func FromCSV(r io.Reader) ([]*Vertex[string], []*Edge[string], error) {
+	var vs []*Vertex[string]
+	var es []*Edge[string]
 	s := bufio.NewScanner(r)
 	for s.Scan() {
 		l := s.Text()
 		f := strings.Split(l, ",")
-		v1 := &Vertex[string]{E: f[0]}
-		if !g.ContainsVertex(v1) {
-			g.AddVertex(v1)
+		v := &Vertex[string]{E: f[0]}
+		u := &Vertex[string]{E: f[1]}
+		vs = append(vs, v, u)
+		e := &Edge[string]{X: v, Y: u}
+		if len(f) < 3 {
+			es = append(es, e)
+			continue
 		}
-		v2 := &Vertex[string]{E: f[1]}
-		if !g.ContainsVertex(v2) {
-			g.AddVertex(v2)
+		w, err := strconv.Atoi(f[2])
+		if err != nil {
+			return nil, nil, err
 		}
-		e := &Edge[string]{X: v1, Y: v2}
-		if !g.ContainsEdge(e) {
-			if len(f) < 3 {
-				g.AddEdge(e)
-				continue
-			}
-			w, err := strconv.Atoi(f[2])
-			if err != nil {
-				log.Panic(err)
-			}
-			e.P = EdgeProperty{W: w}
-			g.AddEdge(e)
-		}
+		e.P.W = w
+		es = append(es, e)
 	}
-	return g
+	return vs, es, nil
+}
+
+func FromSpaced(r io.Reader) ([]*Vertex[string], []*Edge[string], error) {
+	var vs []*Vertex[string]
+	var es []*Edge[string]
+	s := bufio.NewScanner(r)
+	for s.Scan() {
+		var vv, uu, cc string
+		var ww int
+		fmt.Sscanf(s.Text(), "%s %s %d %s", &vv, &uu, &ww, &cc)
+		v := &Vertex[string]{E: vv}
+		u := &Vertex[string]{E: uu}
+		vs = append(vs, v, u)
+		// replace C with cc
+		e := &Edge[string]{X: v, Y: u, P: EdgeProperty{W: ww, C: color.Black}}
+		es = append(es, e)
+	}
+	return vs, es, nil
 }
 
 func getVertex[T comparable](g Graph[T], v *Vertex[T]) (int, *Vertex[T], error) {

@@ -10,7 +10,12 @@ import (
 )
 
 func TestMSTOnTicketToRideUSA(t *testing.T) {
-	g := graph.NewFromCSV(graph.ArcsListType, strings.NewReader(strings.Join(internal.TicketToRideUSA, "\n")))
+	g := graph.New[string](graph.ArcsListType)
+	vs, es, err := graph.FromCSV(strings.NewReader(strings.Join(internal.TicketToRideUSA, "\n")))
+	if err != nil {
+		t.Fatal(err)
+	}
+	graph.Fill(vs, es, g)
 	tree := mst.Kruskal(g)
 	var cost int
 	for _, e := range tree.Edges() {

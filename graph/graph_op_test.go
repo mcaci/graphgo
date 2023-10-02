@@ -131,7 +131,12 @@ func TestGraphCreationOK(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			for i := 0; i <= graph.AdjacencyMatrixType; i++ {
 				t.Run(strconv.Itoa(i), func(t *testing.T) {
-					g := graph.NewFromCSV(i, strings.NewReader(strings.Join(tc.edges, "\n")))
+					vs, es, err := graph.FromCSV(strings.NewReader(strings.Join(tc.edges, "\n")))
+					if err != nil {
+						t.Fatal(err)
+					}
+					g := graph.New[string](i)
+					graph.Fill(vs, es, g)
 					if !g.AreAdjacent(&tc.a, &tc.b) {
 						t.Fatalf("expecting %v to contain (%v,%v)", g, tc.a, tc.b)
 					}
@@ -146,7 +151,12 @@ func TestGraphDegreeOK(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			for i := 0; i <= graph.AdjacencyMatrixType; i++ {
 				t.Run(strconv.Itoa(i), func(t *testing.T) {
-					g := graph.NewFromCSV(i, strings.NewReader(strings.Join(tc.edges, "\n")))
+					vs, es, err := graph.FromCSV(strings.NewReader(strings.Join(tc.edges, "\n")))
+					if err != nil {
+						t.Fatal(err)
+					}
+					g := graph.New[string](i)
+					graph.Fill(vs, es, g)
 					if d := g.Degree(&tc.a); d != tc.degree {
 						t.Fatalf("expecting node %v from graph %v to have degree %v but was %v", tc.a, g, tc.degree, d)
 					}
@@ -161,7 +171,12 @@ func TestAdjNodesOK(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			for i := 0; i <= graph.AdjacencyMatrixType; i++ {
 				t.Run(strconv.Itoa(i), func(t *testing.T) {
-					g := graph.NewFromCSV(i, strings.NewReader(strings.Join(tc.edges, "\n")))
+					vs, es, err := graph.FromCSV(strings.NewReader(strings.Join(tc.edges, "\n")))
+					if err != nil {
+						t.Fatal(err)
+					}
+					g := graph.New[string](i)
+					graph.Fill(vs, es, g)
 					nodes := g.AdjacentNodes(&tc.a)
 					for _, tcn := range tc.adjNodes {
 						var found bool

@@ -10,8 +10,13 @@ import (
 )
 
 func TestDistanceInTicketToRide(t *testing.T) {
-	g := graph.NewFromCSV(graph.AdjacencyMatrixType, strings.NewReader(strings.Join(internal.TicketToRideUSA, "\n")))
-	vs := g.Vertices()
+	g := graph.New[string](graph.AdjacencyMatrixType)
+	vs, es, err := graph.FromCSV(strings.NewReader(strings.Join(internal.TicketToRideUSA, "\n")))
+	if err != nil {
+		t.Fatal(err)
+	}
+	graph.Fill(vs, es, g)
+	vs = g.Vertices()
 	var v1, v2 *graph.Vertex[string]
 	for i := range vs {
 		switch vs[i].E {
@@ -28,8 +33,13 @@ func TestDistanceInTicketToRide(t *testing.T) {
 }
 
 func TestPathInTicketToRide(t *testing.T) {
-	g := graph.NewFromCSV(graph.AdjacencyMatrixType, strings.NewReader(strings.Join(internal.TicketToRideUSA, "\n")))
-	vs := g.Vertices()
+	g := graph.New[string](graph.AdjacencyMatrixType)
+	vs, es, err := graph.FromCSV(strings.NewReader(strings.Join(internal.TicketToRideUSA, "\n")))
+	if err != nil {
+		t.Fatal(err)
+	}
+	graph.Fill(vs, es, g)
+	vs = g.Vertices()
 	var v1, v2 *graph.Vertex[string]
 	for i := range vs {
 		switch vs[i].E {

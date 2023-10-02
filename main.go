@@ -2,16 +2,23 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"strings"
 
 	"github.com/mcaci/graphgo/graph"
 )
 
-const edges = `Vancouver Seattle 1 grey
+const csv = `Vancouver Seattle 1 grey
 Seattle Helena 6 yellow
 Helena SaltLakeCity 3 pink
 Seattle Portland 1 grey`
 
 func main() {
-	fmt.Printf("g: %v\n", graph.NewFromCSV(graph.ArcsListType, strings.NewReader(edges)))
+	g := graph.New[string](graph.AdjacencyListType)
+	vs, es, err := graph.FromSpaced(strings.NewReader(csv))
+	if err != nil {
+		log.Print(err)
+	}
+	graph.Fill(vs, es, g)
+	fmt.Printf("g: %v\n", g)
 }
