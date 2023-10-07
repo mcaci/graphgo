@@ -14,7 +14,7 @@ func TestVisitTicketToRideUSA(t *testing.T) {
 	for i := 0; i <= graph.AdjacencyMatrixType; i++ {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			g := graph.New[string](i)
-			vs, es, err := graph.FromCSV(strings.NewReader(strings.Join(internal.TicketToRideUSA, "\n")))
+			vs, es, err := graph.FromCSV(strings.NewReader(strings.Join(internal.MiniTicket, "\n")))
 			if err != nil {
 				t.Fatal(err)
 			}

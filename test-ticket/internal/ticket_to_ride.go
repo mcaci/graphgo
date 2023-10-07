@@ -80,3 +80,12 @@ var TicketToRideUSA = []string{
 	"Little Rock,Dallas,2",
 	"Little Rock,Oklahoma City,2",
 }
+
+var MiniTicket = []string{
+	"Vancouver,Seattle,1",
+	"Seattle,Helena,6",
+	"Helena,Calgary,4",
+	"Duluth,Helena,6",
+	"Duluth,Chicago,3",
+	"Omaha,Chicago,4",
+}

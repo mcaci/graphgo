@@ -57,7 +57,9 @@ func Fill[T comparable](vs []*Vertex[T], es []*Edge[T], into Graph[T]) {
 		if into.ContainsEdge(e) {
 			continue
 		}
-		into.AddEdge(e)
+		_, v, _ := getVertexFromList(vs, e.X)
+		_, u, _ := getVertexFromList(vs, e.Y)
+		into.AddEdge(&Edge[T]{X: v, Y: u, P: e.P})
 	}
 }
 
@@ -104,8 +106,12 @@ func FromSpaced(r io.Reader) ([]*Vertex[string], []*Edge[string], error) {
 	return vs, es, nil
 }
 
-func getVertex[T comparable](g Graph[T], v *Vertex[T]) (int, *Vertex[T], error) {
-	for i, u := range g.Vertices() {
+func getVertex[T comparable](g interface{ Vertices() []*Vertex[T] }, v *Vertex[T]) (int, *Vertex[T], error) {
+	return getVertexFromList(g.Vertices(), v)
+}
+
+func getVertexFromList[T comparable](vs []*Vertex[T], v *Vertex[T]) (int, *Vertex[T], error) {
+	for i, u := range vs {
 		if u.E != v.E {
 			continue
 		}
