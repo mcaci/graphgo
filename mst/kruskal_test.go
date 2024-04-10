@@ -30,7 +30,7 @@ func TestGenericKruskalMST(t *testing.T) {
 		{name: "Distance with two nodes", setup: func(graphType int) graph.Graph[int] {
 			v1 := &graph.Vertex[int]{E: 1}
 			v2 := &graph.Vertex[int]{E: 2}
-			e := &graph.Edge[int]{X: v1, Y: v2, P: graph.EdgeProperty{W: 5}}
+			e := &graph.Edge[int]{X: v1, Y: v2, P: mst.EdgeWeightAndColor{W: 5}}
 			g := graph.New[int](graph.AdjacencyMatrixType)
 			g.AddVertex(v1)
 			g.AddVertex(v2)
@@ -39,21 +39,21 @@ func TestGenericKruskalMST(t *testing.T) {
 		}, ok: func(g graph.Graph[int]) bool {
 			v1 := &graph.Vertex[int]{E: 1}
 			v2 := &graph.Vertex[int]{E: 2}
-			e := &graph.Edge[int]{X: v1, Y: v2, P: graph.EdgeProperty{W: 5}}
+			e := &graph.Edge[int]{X: v1, Y: v2, P: mst.EdgeWeightAndColor{W: 5}}
 			return g.ContainsEdge(e)
 		}, errMsg: func(g graph.Graph[int]) string {
 			v1 := &graph.Vertex[int]{E: 1}
 			v2 := &graph.Vertex[int]{E: 2}
-			e := &graph.Edge[int]{X: v1, Y: v2, P: graph.EdgeProperty{W: 5}}
+			e := &graph.Edge[int]{X: v1, Y: v2, P: mst.EdgeWeightAndColor{W: 5}}
 			return fmt.Sprintf("Expecting graph %v to contain edge %v but it did not", g, e)
 		}},
 		{name: "Distance with three nodes", setup: func(graphType int) graph.Graph[int] {
 			v1 := &graph.Vertex[int]{E: 1}
 			v2 := &graph.Vertex[int]{E: 2}
 			v3 := &graph.Vertex[int]{E: 3}
-			e1 := &graph.Edge[int]{X: v1, Y: v2, P: graph.EdgeProperty{W: 10}}
-			e2 := &graph.Edge[int]{X: v3, Y: v2, P: graph.EdgeProperty{W: 8}}
-			e3 := &graph.Edge[int]{X: v1, Y: v3, P: graph.EdgeProperty{W: 7}}
+			e1 := &graph.Edge[int]{X: v1, Y: v2, P: mst.EdgeWeightAndColor{W: 10}}
+			e2 := &graph.Edge[int]{X: v3, Y: v2, P: mst.EdgeWeightAndColor{W: 8}}
+			e3 := &graph.Edge[int]{X: v1, Y: v3, P: mst.EdgeWeightAndColor{W: 7}}
 			g := graph.New[int](graph.AdjacencyMatrixType)
 			g.AddVertex(v1)
 			g.AddVertex(v2)
@@ -65,12 +65,12 @@ func TestGenericKruskalMST(t *testing.T) {
 		}, ok: func(g graph.Graph[int]) bool {
 			v1 := &graph.Vertex[int]{E: 1}
 			v2 := &graph.Vertex[int]{E: 2}
-			e := &graph.Edge[int]{X: v1, Y: v2, P: graph.EdgeProperty{W: 10}}
+			e := &graph.Edge[int]{X: v1, Y: v2, P: mst.EdgeWeightAndColor{W: 10}}
 			return !g.ContainsEdge(e)
 		}, errMsg: func(g graph.Graph[int]) string {
 			v1 := &graph.Vertex[int]{E: 1}
 			v2 := &graph.Vertex[int]{E: 2}
-			e := &graph.Edge[int]{X: v1, Y: v2, P: graph.EdgeProperty{W: 10}}
+			e := &graph.Edge[int]{X: v1, Y: v2, P: mst.EdgeWeightAndColor{W: 10}}
 			return fmt.Sprintf("Expecting graph %v to not contain edge %v but it did", g, e)
 		}},
 		{name: "Five vertices graph", setup: func(graphType int) graph.Graph[int] {
@@ -79,14 +79,14 @@ func TestGenericKruskalMST(t *testing.T) {
 			v3 := &graph.Vertex[int]{E: 3}
 			v4 := &graph.Vertex[int]{E: 4}
 			v5 := &graph.Vertex[int]{E: 5}
-			e1 := graph.Edge[int]{X: v1, Y: v2, P: graph.EdgeProperty{W: 3}}
-			e2 := graph.Edge[int]{X: v3, Y: v4, P: graph.EdgeProperty{W: 2}}
-			e3 := graph.Edge[int]{X: v1, Y: v5, P: graph.EdgeProperty{W: 8}}
-			e4 := graph.Edge[int]{X: v5, Y: v2, P: graph.EdgeProperty{W: 4}}
-			e5 := graph.Edge[int]{X: v4, Y: v2, P: graph.EdgeProperty{W: 8}}
-			e6 := graph.Edge[int]{X: v3, Y: v5, P: graph.EdgeProperty{W: 6}}
-			e7 := graph.Edge[int]{X: v3, Y: v1, P: graph.EdgeProperty{W: 11}}
-			e8 := graph.Edge[int]{X: v4, Y: v5, P: graph.EdgeProperty{W: 9}}
+			e1 := graph.Edge[int]{X: v1, Y: v2, P: mst.EdgeWeightAndColor{W: 3}}
+			e2 := graph.Edge[int]{X: v3, Y: v4, P: mst.EdgeWeightAndColor{W: 2}}
+			e3 := graph.Edge[int]{X: v1, Y: v5, P: mst.EdgeWeightAndColor{W: 8}}
+			e4 := graph.Edge[int]{X: v5, Y: v2, P: mst.EdgeWeightAndColor{W: 4}}
+			e5 := graph.Edge[int]{X: v4, Y: v2, P: mst.EdgeWeightAndColor{W: 8}}
+			e6 := graph.Edge[int]{X: v3, Y: v5, P: mst.EdgeWeightAndColor{W: 6}}
+			e7 := graph.Edge[int]{X: v3, Y: v1, P: mst.EdgeWeightAndColor{W: 11}}
+			e8 := graph.Edge[int]{X: v4, Y: v5, P: mst.EdgeWeightAndColor{W: 9}}
 			g := graph.New[int](graphType)
 			g.AddVertex(v1)
 			g.AddVertex(v2)
@@ -105,12 +105,12 @@ func TestGenericKruskalMST(t *testing.T) {
 		}, ok: func(g graph.Graph[int]) bool {
 			v2 := &graph.Vertex[int]{E: 2}
 			v5 := &graph.Vertex[int]{E: 5}
-			e4 := &graph.Edge[int]{X: v5, Y: v2, P: graph.EdgeProperty{W: 4}}
+			e4 := &graph.Edge[int]{X: v5, Y: v2, P: mst.EdgeWeightAndColor{W: 4}}
 			return g.ContainsEdge(e4)
 		}, errMsg: func(g graph.Graph[int]) string {
 			v2 := &graph.Vertex[int]{E: 2}
 			v5 := &graph.Vertex[int]{E: 5}
-			e4 := graph.Edge[int]{X: v5, Y: v2, P: graph.EdgeProperty{W: 4}}
+			e4 := graph.Edge[int]{X: v5, Y: v2, P: mst.EdgeWeightAndColor{W: 4}}
 			return fmt.Sprintf("Expecting graph %v to contain edge %v but it did not", g, e4)
 		}},
 	}

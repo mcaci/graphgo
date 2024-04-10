@@ -1,6 +1,7 @@
 package mst
 
 import (
+	"fmt"
 	"image/color"
 	"sort"
 
@@ -9,9 +10,13 @@ import (
 
 type SortedEdges[T comparable] []*graph.Edge[T]
 
-func (se *SortedEdges[T]) Len() int           { return len(*se) }
-func (se *SortedEdges[T]) Less(i, j int) bool { return (*se)[i].P.W <= (*se)[j].P.W }
-func (se *SortedEdges[T]) Swap(i, j int)      { (*se)[i], (*se)[j] = (*se)[j], (*se)[i] }
+func (se *SortedEdges[T]) Len() int      { return len(*se) }
+func (se *SortedEdges[T]) Swap(i, j int) { (*se)[i], (*se)[j] = (*se)[j], (*se)[i] }
+func (se *SortedEdges[T]) Less(i, j int) bool {
+	pi := (*se)[i].P.(EdgeWeightAndColor)
+	pj := (*se)[j].P.(EdgeWeightAndColor)
+	return pi.W <= pj.W
+}
 
 func Kruskal[T comparable](g graph.Graph[T]) graph.Graph[T] {
 	var blueTrees []graph.Graph[T]
@@ -34,11 +39,12 @@ func Kruskal[T comparable](g graph.Graph[T]) graph.Graph[T] {
 		}
 		btx := find(e.X)
 		bty := find(e.Y)
+		p := e.P.(EdgeWeightAndColor)
 		switch btx == bty {
 		case true:
-			e.P.C = color.RGBA{R: 255}
+			p.C = color.RGBA{R: 255}
 		default:
-			e.P.C = color.RGBA{B: 255}
+			p.C = color.RGBA{B: 255}
 			g := &graph.ArcsList[T]{}
 			g.AddEdge(e)
 			for _, v := range blueTrees[btx].Vertices() {
@@ -65,4 +71,13 @@ func Kruskal[T comparable](g graph.Graph[T]) graph.Graph[T] {
 		}
 	}
 	return blueTrees[0]
+}
+
+type EdgeWeightAndColor struct {
+	W int
+	C color.Color
+}
+
+func (e EdgeWeightAndColor) String() string {
+	return fmt.Sprintf("(w:%d,c:%v)", e.W, e.C)
 }

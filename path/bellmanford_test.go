@@ -23,7 +23,7 @@ func TestGenericDistance(t *testing.T) {
 		{name: "Distance with two nodes", setup: func(graphType int) (graph.Graph[int], *graph.Vertex[int], *graph.Vertex[int]) {
 			v1 := &graph.Vertex[int]{E: 1}
 			v2 := &graph.Vertex[int]{E: 2}
-			e := &graph.Edge[int]{X: v1, Y: v2, P: graph.EdgeProperty{W: 5}}
+			e := &graph.Edge[int]{X: v1, Y: v2, P: path.EdgeWeight(5)}
 			g := graph.New[int](graph.AdjacencyMatrixType)
 			g.AddVertex(v1)
 			g.AddVertex(v2)
@@ -37,14 +37,14 @@ func TestGenericDistance(t *testing.T) {
 			v3 := &graph.Vertex[int]{E: 3}
 			v4 := &graph.Vertex[int]{E: 4}
 			v5 := &graph.Vertex[int]{E: 5}
-			e1 := graph.Edge[int]{X: v1, Y: v2, P: graph.EdgeProperty{W: 3}}
-			e2 := graph.Edge[int]{X: v3, Y: v4, P: graph.EdgeProperty{W: 2}}
-			e3 := graph.Edge[int]{X: v1, Y: v5, P: graph.EdgeProperty{W: 8}}
-			e4 := graph.Edge[int]{X: v5, Y: v2, P: graph.EdgeProperty{W: 4}}
-			e5 := graph.Edge[int]{X: v4, Y: v2, P: graph.EdgeProperty{W: 8}}
-			e6 := graph.Edge[int]{X: v3, Y: v5, P: graph.EdgeProperty{W: 6}}
-			e7 := graph.Edge[int]{X: v3, Y: v1, P: graph.EdgeProperty{W: 11}}
-			e8 := graph.Edge[int]{X: v4, Y: v5, P: graph.EdgeProperty{W: 9}}
+			e1 := graph.Edge[int]{X: v1, Y: v2, P: path.EdgeWeight(3)}
+			e2 := graph.Edge[int]{X: v3, Y: v4, P: path.EdgeWeight(2)}
+			e3 := graph.Edge[int]{X: v1, Y: v5, P: path.EdgeWeight(8)}
+			e4 := graph.Edge[int]{X: v5, Y: v2, P: path.EdgeWeight(4)}
+			e5 := graph.Edge[int]{X: v4, Y: v2, P: path.EdgeWeight(8)}
+			e6 := graph.Edge[int]{X: v3, Y: v5, P: path.EdgeWeight(6)}
+			e7 := graph.Edge[int]{X: v3, Y: v1, P: path.EdgeWeight(11)}
+			e8 := graph.Edge[int]{X: v4, Y: v5, P: path.EdgeWeight(9)}
 			g := graph.New[int](graphType)
 			g.AddVertex(v1)
 			g.AddVertex(v2)

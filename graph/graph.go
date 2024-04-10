@@ -1,13 +1,7 @@
 package graph
 
 import (
-	"bufio"
 	"errors"
-	"fmt"
-	"image/color"
-	"io"
-	"strconv"
-	"strings"
 )
 
 type Graph[T comparable] interface {
@@ -61,49 +55,6 @@ func Fill[T comparable](vs []*Vertex[T], es []*Edge[T], into Graph[T]) {
 		_, u, _ := getVertexFromList(vs, e.Y)
 		into.AddEdge(&Edge[T]{X: v, Y: u, P: e.P})
 	}
-}
-
-func FromCSV(r io.Reader) ([]*Vertex[string], []*Edge[string], error) {
-	var vs []*Vertex[string]
-	var es []*Edge[string]
-	s := bufio.NewScanner(r)
-	for s.Scan() {
-		l := s.Text()
-		f := strings.Split(l, ",")
-		v := &Vertex[string]{E: f[0]}
-		u := &Vertex[string]{E: f[1]}
-		vs = append(vs, v, u)
-		e := &Edge[string]{X: v, Y: u}
-		if len(f) < 3 {
-			es = append(es, e)
-			continue
-		}
-		w, err := strconv.Atoi(f[2])
-		if err != nil {
-			return nil, nil, err
-		}
-		e.P.W = w
-		es = append(es, e)
-	}
-	return vs, es, nil
-}
-
-func FromSpaced(r io.Reader) ([]*Vertex[string], []*Edge[string], error) {
-	var vs []*Vertex[string]
-	var es []*Edge[string]
-	s := bufio.NewScanner(r)
-	for s.Scan() {
-		var vv, uu, cc string
-		var ww int
-		fmt.Sscanf(s.Text(), "%s %s %d %s", &vv, &uu, &ww, &cc)
-		v := &Vertex[string]{E: vv}
-		u := &Vertex[string]{E: uu}
-		vs = append(vs, v, u)
-		// replace C with cc
-		e := &Edge[string]{X: v, Y: u, P: EdgeProperty{W: ww, C: color.Black}}
-		es = append(es, e)
-	}
-	return vs, es, nil
 }
 
 func getVertex[T comparable](g interface{ Vertices() []*Vertex[T] }, v *Vertex[T]) (int, *Vertex[T], error) {

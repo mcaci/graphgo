@@ -131,7 +131,7 @@ func TestGraphCreationOK(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			for i := 0; i <= graph.AdjacencyMatrixType; i++ {
 				t.Run(strconv.Itoa(i), func(t *testing.T) {
-					vs, es, err := graph.FromCSV(strings.NewReader(strings.Join(tc.edges, "\n")))
+					vs, es, err := FromCSV(strings.NewReader(strings.Join(tc.edges, "\n")))
 					if err != nil {
 						t.Fatal(err)
 					}
@@ -151,7 +151,7 @@ func TestGraphDegreeOK(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			for i := 0; i <= graph.AdjacencyMatrixType; i++ {
 				t.Run(strconv.Itoa(i), func(t *testing.T) {
-					vs, es, err := graph.FromCSV(strings.NewReader(strings.Join(tc.edges, "\n")))
+					vs, es, err := FromCSV(strings.NewReader(strings.Join(tc.edges, "\n")))
 					if err != nil {
 						t.Fatal(err)
 					}
@@ -171,7 +171,7 @@ func TestAdjNodesOK(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			for i := 0; i <= graph.AdjacencyMatrixType; i++ {
 				t.Run(strconv.Itoa(i), func(t *testing.T) {
-					vs, es, err := graph.FromCSV(strings.NewReader(strings.Join(tc.edges, "\n")))
+					vs, es, err := FromCSV(strings.NewReader(strings.Join(tc.edges, "\n")))
 					if err != nil {
 						t.Fatal(err)
 					}
