@@ -10,7 +10,7 @@ import (
 )
 
 func TestMSTOnTicketToRideUSA(t *testing.T) {
-	g := graph.New[string](graph.ArcsListType)
+	g := graph.New[string](graph.ArcsListType, false)
 	vs, es, err := internal.FromCSV(strings.NewReader(strings.Join(internal.TicketToRideUSA, "\n")), func(w int) graph.EdgeProperty { return mst.EdgeWeightAndColor{W: w} })
 	if err != nil {
 		t.Fatal(err)

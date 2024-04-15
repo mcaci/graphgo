@@ -6,8 +6,9 @@ import (
 )
 
 type ArcsList[T comparable] struct {
-	v []*Vertex[T]
-	e []*Edge[T]
+	v        []*Vertex[T]
+	e        []*Edge[T]
+	directed bool
 }
 
 func (g *ArcsList[T]) AddVertex(v *Vertex[T]) {
@@ -15,16 +16,15 @@ func (g *ArcsList[T]) AddVertex(v *Vertex[T]) {
 }
 
 func (g *ArcsList[T]) RemoveVertex(v *Vertex[T]) {
-	i, _, err := getVertex[T](g, v)
-	if err != nil {
+	i := indexVertex(g.Vertices(), v)
+	if i < 0 {
 		return
 	}
 	g.v = append(g.v[:i], g.v[i+1:]...)
 }
 
 func (g *ArcsList[T]) ContainsVertex(v *Vertex[T]) bool {
-	_, _, err := getVertex[T](g, v)
-	return err == nil
+	return indexVertex(g.Vertices(), v) >= 0
 }
 
 func (g *ArcsList[T]) AddEdge(e *Edge[T]) {
@@ -32,24 +32,19 @@ func (g *ArcsList[T]) AddEdge(e *Edge[T]) {
 }
 
 func (g *ArcsList[T]) RemoveEdge(e *Edge[T]) {
-	i, _, err := getEdge[T](g, e)
-	if err != nil {
+	i := indexEdge[T](g, e)
+	if i < 0 {
 		return
 	}
 	g.e = append(g.e[:i], g.e[i+1:]...)
 }
 
 func (g *ArcsList[T]) ContainsEdge(e *Edge[T]) bool {
-	_, _, err := getEdge[T](g, e)
-	return err == nil
+	return indexEdge[T](g, e) >= 0
 }
 
 func (g *ArcsList[T]) AreAdjacent(a, b *Vertex[T]) bool {
-	_, e, err := getEdge[T](g, &Edge[T]{X: a, Y: b})
-	if err != nil {
-		return false
-	}
-	return e != nil
+	return g.ContainsEdge(&Edge[T]{X: a, Y: b})
 }
 
 func (g *ArcsList[T]) Degree(v *Vertex[T]) int {
@@ -76,6 +71,7 @@ func (g *ArcsList[T]) AdjacentNodes(v *Vertex[T]) []*Vertex[T] {
 	return nodes
 }
 
+func (g *ArcsList[T]) IsDirected() bool       { return g.directed }
 func (g *ArcsList[T]) Vertices() []*Vertex[T] { return g.v }
 func (g *ArcsList[T]) Edges() []*Edge[T]      { return g.e }
 

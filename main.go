@@ -16,7 +16,7 @@ Helena SaltLakeCity 3 pink
 Seattle Portland 1 grey`
 
 func main() {
-	g := graph.New[string](graph.AdjacencyListType)
+	g := graph.New[string](graph.AdjacencyListType, false)
 	vs, es, err := FromSpaced(strings.NewReader(csv))
 	if err != nil {
 		log.Print(err)

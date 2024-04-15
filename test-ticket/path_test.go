@@ -10,7 +10,7 @@ import (
 )
 
 func TestDistanceInTicketToRide(t *testing.T) {
-	g := graph.New[string](graph.AdjacencyMatrixType)
+	g := graph.New[string](graph.AdjacencyMatrixType, false)
 	vs, es, err := internal.FromCSV(strings.NewReader(strings.Join(internal.TicketToRideUSA, "\n")), func(w int) graph.EdgeProperty { return path.EdgeWeight(w) })
 	if err != nil {
 		t.Fatal(err)
@@ -33,7 +33,7 @@ func TestDistanceInTicketToRide(t *testing.T) {
 }
 
 func TestPathInTicketToRide(t *testing.T) {
-	g := graph.New[string](graph.AdjacencyMatrixType)
+	g := graph.New[string](graph.AdjacencyMatrixType, false)
 	vs, es, err := internal.FromCSV(strings.NewReader(strings.Join(internal.TicketToRideUSA, "\n")), func(w int) graph.EdgeProperty { return path.EdgeWeight(w) })
 	if err != nil {
 		t.Fatal(err)

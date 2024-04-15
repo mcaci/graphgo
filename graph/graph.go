@@ -1,13 +1,14 @@
 package graph
 
 import (
-	"errors"
+	"slices"
 )
 
 type Graph[T comparable] interface {
 	AreAdjacent(a, b *Vertex[T]) bool
 	Degree(v *Vertex[T]) int
 	AdjacentNodes(v *Vertex[T]) []*Vertex[T]
+	IsDirected() bool
 
 	Vertices() []*Vertex[T]
 	Edges() []*Edge[T]
@@ -27,14 +28,14 @@ const (
 	// IncidenceMatrixType
 )
 
-func New[T comparable](graphType int) Graph[T] {
+func New[T comparable](graphType int, isDirected bool) Graph[T] {
 	switch graphType {
 	case ArcsListType:
-		return &ArcsList[T]{}
+		return &ArcsList[T]{directed: isDirected}
 	case AdjacencyListType:
-		return &AdjacencyLists[T]{}
+		return &AdjacencyLists[T]{directed: isDirected}
 	case AdjacencyMatrixType:
-		return &AdjacencyMatrix[T]{}
+		return &AdjacencyMatrix[T]{directed: isDirected}
 	default:
 		return &ArcsList[T]{}
 	}
@@ -51,33 +52,29 @@ func Fill[T comparable](vs []*Vertex[T], es []*Edge[T], into Graph[T]) {
 		if into.ContainsEdge(e) {
 			continue
 		}
-		_, v, _ := getVertexFromList(vs, e.X)
-		_, u, _ := getVertexFromList(vs, e.Y)
+		v, u := vs[indexVertex(vs, e.X)], vs[indexVertex(vs, e.Y)]
 		into.AddEdge(&Edge[T]{X: v, Y: u, P: e.P})
 	}
 }
 
-func getVertex[T comparable](g interface{ Vertices() []*Vertex[T] }, v *Vertex[T]) (int, *Vertex[T], error) {
-	return getVertexFromList(g.Vertices(), v)
+func indexVertex[T comparable](vs []*Vertex[T], v *Vertex[T]) int {
+	return slices.IndexFunc(vs, func(o *Vertex[T]) bool { return v.E == o.E })
 }
 
-func getVertexFromList[T comparable](vs []*Vertex[T], v *Vertex[T]) (int, *Vertex[T], error) {
-	for i, u := range vs {
-		if u.E != v.E {
-			continue
-		}
-		return i, u, nil
+func indexEdge[T comparable](g Graph[T], e *Edge[T]) int {
+	edges := g.Edges()
+	switch g.IsDirected() {
+	case true:
+		return slices.IndexFunc(edges, func(o *Edge[T]) bool {
+			return e.X.E == o.X.E && e.Y.E == o.Y.E
+		})
+	case false:
+		return slices.IndexFunc(edges, func(o *Edge[T]) bool {
+			x2y := e.X.E == o.X.E && e.Y.E == o.Y.E
+			y2x := e.X.E == o.Y.E && e.Y.E == o.X.E
+			return x2y || y2x
+		})
+	default:
+		return -1
 	}
-	return 0, nil, errors.New("Vertex not found")
-}
-
-func getEdge[T comparable](g Graph[T], e *Edge[T]) (int, *Edge[T], error) {
-	for i, edge := range g.Edges() {
-		switch {
-		case edge.X.E == e.X.E && edge.Y.E == e.Y.E,
-			edge.X.E == e.Y.E && edge.Y.E == e.X.E:
-			return i, edge, nil
-		}
-	}
-	return 0, nil, errors.New("Edge not found")
 }

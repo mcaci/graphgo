@@ -31,7 +31,7 @@ func TestGenericKruskalMST(t *testing.T) {
 			v1 := &graph.Vertex[int]{E: 1}
 			v2 := &graph.Vertex[int]{E: 2}
 			e := &graph.Edge[int]{X: v1, Y: v2, P: mst.EdgeWeightAndColor{W: 5}}
-			g := graph.New[int](graph.AdjacencyMatrixType)
+			g := graph.New[int](graph.AdjacencyMatrixType, false)
 			g.AddVertex(v1)
 			g.AddVertex(v2)
 			g.AddEdge(e)
@@ -54,7 +54,7 @@ func TestGenericKruskalMST(t *testing.T) {
 			e1 := &graph.Edge[int]{X: v1, Y: v2, P: mst.EdgeWeightAndColor{W: 10}}
 			e2 := &graph.Edge[int]{X: v3, Y: v2, P: mst.EdgeWeightAndColor{W: 8}}
 			e3 := &graph.Edge[int]{X: v1, Y: v3, P: mst.EdgeWeightAndColor{W: 7}}
-			g := graph.New[int](graph.AdjacencyMatrixType)
+			g := graph.New[int](graph.AdjacencyMatrixType, false)
 			g.AddVertex(v1)
 			g.AddVertex(v2)
 			g.AddVertex(v3)
@@ -87,7 +87,7 @@ func TestGenericKruskalMST(t *testing.T) {
 			e6 := graph.Edge[int]{X: v3, Y: v5, P: mst.EdgeWeightAndColor{W: 6}}
 			e7 := graph.Edge[int]{X: v3, Y: v1, P: mst.EdgeWeightAndColor{W: 11}}
 			e8 := graph.Edge[int]{X: v4, Y: v5, P: mst.EdgeWeightAndColor{W: 9}}
-			g := graph.New[int](graphType)
+			g := graph.New[int](graphType, false)
 			g.AddVertex(v1)
 			g.AddVertex(v2)
 			g.AddVertex(v3)

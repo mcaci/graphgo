@@ -29,7 +29,7 @@ func FromCSV(r io.Reader) ([]*graph.Vertex[string], []*graph.Edge[string], error
 			}
 			es = append(es, &graph.Edge[string]{X: v, Y: u, P: EdgeWeight(w)})
 		default:
-			es = append(es, &graph.Edge[string]{X: v, Y: u})
+			es = append(es, &graph.Edge[string]{X: v, Y: u, P: EdgeWeight(0)})
 		}
 	}
 	return vs, es, nil

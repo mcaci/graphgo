@@ -135,7 +135,7 @@ func TestGraphCreationOK(t *testing.T) {
 					if err != nil {
 						t.Fatal(err)
 					}
-					g := graph.New[string](i)
+					g := graph.New[string](i, false)
 					graph.Fill(vs, es, g)
 					if !g.AreAdjacent(&tc.a, &tc.b) {
 						t.Fatalf("expecting %v to contain (%v,%v)", g, tc.a, tc.b)
@@ -155,7 +155,7 @@ func TestGraphDegreeOK(t *testing.T) {
 					if err != nil {
 						t.Fatal(err)
 					}
-					g := graph.New[string](i)
+					g := graph.New[string](i, false)
 					graph.Fill(vs, es, g)
 					if d := g.Degree(&tc.a); d != tc.degree {
 						t.Fatalf("expecting node %v from graph %v to have degree %v but was %v", tc.a, g, tc.degree, d)
@@ -175,7 +175,7 @@ func TestAdjNodesOK(t *testing.T) {
 					if err != nil {
 						t.Fatal(err)
 					}
-					g := graph.New[string](i)
+					g := graph.New[string](i, false)
 					graph.Fill(vs, es, g)
 					nodes := g.AdjacentNodes(&tc.a)
 					for _, tcn := range tc.adjNodes {

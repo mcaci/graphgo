@@ -16,7 +16,7 @@ func TestGenericGraphModificationOperation(t *testing.T) {
 		errMsg func(graph.Graph[int]) string
 	}{
 		{name: "Check on empty graph", setup: func(graphType int) graph.Graph[int] {
-			g := graph.New[int](graphType)
+			g := graph.New[int](graphType, false)
 			return g
 		}, ok: func(g graph.Graph[int]) bool {
 			v := &graph.Vertex[int]{E: 1}
@@ -27,7 +27,7 @@ func TestGenericGraphModificationOperation(t *testing.T) {
 		}},
 		{name: "Check vertex in one vertex graph", setup: func(graphType int) graph.Graph[int] {
 			v := &graph.Vertex[int]{E: 1}
-			g := graph.New[int](graphType)
+			g := graph.New[int](graphType, false)
 			g.AddVertex(v)
 			return g
 		}, ok: func(g graph.Graph[int]) bool {
@@ -41,7 +41,7 @@ func TestGenericGraphModificationOperation(t *testing.T) {
 			v1 := &graph.Vertex[int]{E: 1}
 			v2 := &graph.Vertex[int]{E: 2}
 			e := graph.Edge[int]{X: v1, Y: v2}
-			g := graph.New[int](graphType)
+			g := graph.New[int](graphType, false)
 			g.AddVertex(v1)
 			g.AddVertex(v2)
 			g.AddEdge(&e)
@@ -71,7 +71,7 @@ func TestGenericGraphModificationOperation(t *testing.T) {
 			e6 := graph.Edge[int]{X: v3, Y: v5}
 			e7 := graph.Edge[int]{X: v3, Y: v1}
 			e8 := graph.Edge[int]{X: v4, Y: v5}
-			g := graph.New[int](graphType)
+			g := graph.New[int](graphType, false)
 			g.AddVertex(v1)
 			g.AddVertex(v2)
 			g.AddVertex(v3)
@@ -98,7 +98,7 @@ func TestGenericGraphModificationOperation(t *testing.T) {
 			return fmt.Sprintf("Expecting graph %v to contain edge %v but it did not", g, e)
 		}},
 		{name: "Check non existent vertex", setup: func(graphType int) graph.Graph[int] {
-			g := graph.New[int](graphType)
+			g := graph.New[int](graphType, false)
 			v := &graph.Vertex[int]{E: 5}
 			g.AddVertex(v)
 			return g
@@ -110,7 +110,7 @@ func TestGenericGraphModificationOperation(t *testing.T) {
 			return fmt.Sprintf("Expecting graph %v not to contain vertex %v but it did", g, v)
 		}},
 		{name: "Check non existent edge", setup: func(graphType int) graph.Graph[int] {
-			g := graph.New[int](graphType)
+			g := graph.New[int](graphType, false)
 			x, y := &graph.Vertex[int]{E: 5}, &graph.Vertex[int]{E: 2}
 			g.AddVertex(x)
 			g.AddVertex(y)
@@ -125,7 +125,7 @@ func TestGenericGraphModificationOperation(t *testing.T) {
 			return fmt.Sprintf("Expecting graph %v not to contain vertex %v but it did", g, v)
 		}},
 		{name: "Check vertex removal", setup: func(graphType int) graph.Graph[int] {
-			g := graph.New[int](graphType)
+			g := graph.New[int](graphType, false)
 			v := &graph.Vertex[int]{E: 5}
 			v1 := &graph.Vertex[int]{E: 6}
 			g.AddVertex(v)
@@ -139,7 +139,7 @@ func TestGenericGraphModificationOperation(t *testing.T) {
 			return fmt.Sprintf("Expecting graph %v not to contain vertex %v but it did", g, v)
 		}},
 		{name: "Check removal of non existent vertex", setup: func(graphType int) graph.Graph[int] {
-			g := graph.New[int](graphType)
+			g := graph.New[int](graphType, false)
 			v := &graph.Vertex[int]{E: 5}
 			g.AddVertex(v)
 			g.RemoveVertex(&graph.Vertex[int]{E: 4})
@@ -151,7 +151,7 @@ func TestGenericGraphModificationOperation(t *testing.T) {
 			return fmt.Sprintf("Expecting graph %v to still contain vertex %v but it did not", g, v)
 		}},
 		{name: "Check edge removal", setup: func(graphType int) graph.Graph[int] {
-			g := graph.New[int](graphType)
+			g := graph.New[int](graphType, false)
 			x, y := &graph.Vertex[int]{E: 5}, &graph.Vertex[int]{E: 2}
 			g.AddVertex(x)
 			g.AddVertex(y)
@@ -169,7 +169,7 @@ func TestGenericGraphModificationOperation(t *testing.T) {
 			return fmt.Sprintf("Expecting graph %v not to contain edge %v but it did", g, e)
 		}},
 		{name: "Check removal of non existent edge", setup: func(graphType int) graph.Graph[int] {
-			g := graph.New[int](graphType)
+			g := graph.New[int](graphType, false)
 			x, y := &graph.Vertex[int]{E: 5}, &graph.Vertex[int]{E: 2}
 			g.AddVertex(x)
 			g.AddVertex(y)
@@ -187,7 +187,7 @@ func TestGenericGraphModificationOperation(t *testing.T) {
 			return fmt.Sprintf("Expecting graph %v not to still contain edge %v but it did not", g, e)
 		}},
 		{name: "Check removal of multiple edges", setup: func(graphType int) graph.Graph[int] {
-			g := graph.New[int](graphType)
+			g := graph.New[int](graphType, false)
 			x, y, z := &graph.Vertex[int]{E: 5}, &graph.Vertex[int]{E: 2}, &graph.Vertex[int]{E: 9}
 			g.AddVertex(x)
 			g.AddVertex(y)

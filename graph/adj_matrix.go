@@ -5,8 +5,9 @@ import (
 )
 
 type AdjacencyMatrix[T comparable] struct {
-	m [][]*EdgeProperty
-	v []*Vertex[T]
+	m        [][]*EdgeProperty
+	v        []*Vertex[T]
+	directed bool
 }
 
 func (g *AdjacencyMatrix[T]) AddVertex(v *Vertex[T]) {
@@ -18,8 +19,8 @@ func (g *AdjacencyMatrix[T]) AddVertex(v *Vertex[T]) {
 }
 
 func (g *AdjacencyMatrix[T]) RemoveVertex(v *Vertex[T]) {
-	iRm, _, err := getVertex[T](g, v)
-	if err != nil {
+	iRm := indexVertex[T](g.Vertices(), v)
+	if iRm < 0 {
 		return
 	}
 	g.v = append(g.v[:iRm], g.v[iRm+1:]...)
@@ -50,17 +51,16 @@ func (g *AdjacencyMatrix[T]) RemoveVertex(v *Vertex[T]) {
 }
 
 func (g *AdjacencyMatrix[T]) ContainsVertex(v *Vertex[T]) bool {
-	_, _, err := getVertex[T](g, v)
-	return err == nil
+	return indexVertex[T](g.Vertices(), v) >= 0
 }
 
 func (g *AdjacencyMatrix[T]) AddEdge(e *Edge[T]) {
-	i, _, err := getVertex[T](g, e.X)
-	if err != nil {
+	i := indexVertex[T](g.Vertices(), e.X)
+	if i < 0 {
 		return
 	}
-	j, _, err := getVertex[T](g, e.Y)
-	if err != nil {
+	j := indexVertex[T](g.Vertices(), e.Y)
+	if j < 0 {
 		return
 	}
 	g.m[i][j] = &e.P
@@ -68,12 +68,13 @@ func (g *AdjacencyMatrix[T]) AddEdge(e *Edge[T]) {
 }
 
 func (g *AdjacencyMatrix[T]) RemoveEdge(e *Edge[T]) {
-	i, _, err := getVertex[T](g, e.X)
-	if err != nil {
+	vs := g.Vertices()
+	i := indexVertex(vs, e.X)
+	if i < 0 {
 		return
 	}
-	j, _, err := getVertex[T](g, e.Y)
-	if err != nil {
+	j := indexVertex(vs, e.Y)
+	if j < 0 {
 		return
 	}
 	g.m[i][j] = nil
@@ -81,28 +82,25 @@ func (g *AdjacencyMatrix[T]) RemoveEdge(e *Edge[T]) {
 }
 
 func (g *AdjacencyMatrix[T]) ContainsEdge(e *Edge[T]) bool {
-	i, _, err := getVertex[T](g, e.X)
-	if err != nil {
+	vs := g.Vertices()
+	i := indexVertex(vs, e.X)
+	if i < 0 {
 		return false
 	}
-	j, _, err := getVertex[T](g, e.Y)
-	if err != nil {
+	j := indexVertex(vs, e.Y)
+	if j < 0 {
 		return false
 	}
 	return g.m[i][j] != nil && g.m[j][i] != nil
 }
 
 func (g *AdjacencyMatrix[T]) AreAdjacent(a, b *Vertex[T]) bool {
-	_, e, err := getEdge[T](g, &Edge[T]{X: a, Y: b})
-	if err != nil {
-		return false
-	}
-	return e != nil
+	return g.ContainsEdge(&Edge[T]{X: a, Y: b})
 }
 
 func (g *AdjacencyMatrix[T]) Degree(v *Vertex[T]) int {
-	i, _, err := getVertex[T](g, v)
-	if err != nil {
+	i := indexVertex(g.Vertices(), v)
+	if i < 0 {
 		return 0
 	}
 	var d int
@@ -116,8 +114,8 @@ func (g *AdjacencyMatrix[T]) Degree(v *Vertex[T]) int {
 }
 
 func (g *AdjacencyMatrix[T]) AdjacentNodes(v *Vertex[T]) []*Vertex[T] {
-	i, _, err := getVertex[T](g, v)
-	if err != nil {
+	i := indexVertex(g.Vertices(), v)
+	if i < 0 {
 		return nil
 	}
 	var nodes []*Vertex[T]
@@ -130,6 +128,7 @@ func (g *AdjacencyMatrix[T]) AdjacentNodes(v *Vertex[T]) []*Vertex[T] {
 	return nodes
 }
 
+func (g *AdjacencyMatrix[T]) IsDirected() bool       { return g.directed }
 func (g *AdjacencyMatrix[T]) Vertices() []*Vertex[T] { return g.v }
 func (g *AdjacencyMatrix[T]) Edges() []*Edge[T] {
 	var edges []*Edge[T]
