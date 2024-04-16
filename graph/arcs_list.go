@@ -12,6 +12,9 @@ type ArcsList[T comparable] struct {
 }
 
 func (g *ArcsList[T]) AddVertex(v *Vertex[T]) {
+	if g.ContainsVertex(v) {
+		return
+	}
 	g.v = append(g.v, v)
 }
 
@@ -28,7 +31,15 @@ func (g *ArcsList[T]) ContainsVertex(v *Vertex[T]) bool {
 }
 
 func (g *ArcsList[T]) AddEdge(e *Edge[T]) {
-	g.e = append(g.e, e)
+	if g.ContainsEdge(e) {
+		return
+	}
+	x, y, p := e.X, e.Y, e.P
+	g.e = append(g.e, &Edge[T]{X: x, Y: y, P: p})
+	if g.directed {
+		return
+	}
+	g.e = append(g.e, &Edge[T]{X: y, Y: x, P: p})
 }
 
 func (g *ArcsList[T]) RemoveEdge(e *Edge[T]) {
@@ -37,8 +48,17 @@ func (g *ArcsList[T]) RemoveEdge(e *Edge[T]) {
 		return
 	}
 	g.e = append(g.e[:i], g.e[i+1:]...)
-}
 
+	if g.directed {
+		return
+	}
+
+	j := indexEdge[T](g, &Edge[T]{X: e.Y, Y: e.X})
+	if j < 0 {
+		return
+	}
+	g.e = append(g.e[:j], g.e[j+1:]...)
+}
 func (g *ArcsList[T]) ContainsEdge(e *Edge[T]) bool {
 	return indexEdge[T](g, e) >= 0
 }
@@ -50,10 +70,10 @@ func (g *ArcsList[T]) AreAdjacent(a, b *Vertex[T]) bool {
 func (g *ArcsList[T]) Degree(v *Vertex[T]) int {
 	var d int
 	for _, e := range g.e {
-		switch v.E {
-		case e.X.E, e.Y.E:
-			d++
+		if e.X.E != v.E {
+			continue
 		}
+		d++
 	}
 	return d
 }

@@ -38,9 +38,10 @@ func (g *AdjacencyLists[T]) AddEdge(e *Edge[T]) {
 		g.l[i].n = append(g.l[i].n, &Neighbour[T]{v: y, p: e.P})
 	}
 	add(e.X, e.Y)
-	if !g.directed {
-		add(e.Y, e.X)
+	if g.directed {
+		return
 	}
+	add(e.Y, e.X)
 }
 
 func (g *AdjacencyLists[T]) RemoveEdge(e *Edge[T]) {
@@ -58,9 +59,10 @@ func (g *AdjacencyLists[T]) RemoveEdge(e *Edge[T]) {
 		}
 	}
 	rm(e.X, e.Y)
-	if !g.directed {
-		rm(e.Y, e.X)
+	if g.directed {
+		return
 	}
+	rm(e.Y, e.X)
 }
 
 func (g *AdjacencyLists[T]) ContainsEdge(e *Edge[T]) bool {

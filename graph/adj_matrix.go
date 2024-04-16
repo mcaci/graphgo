@@ -64,6 +64,9 @@ func (g *AdjacencyMatrix[T]) AddEdge(e *Edge[T]) {
 		return
 	}
 	g.m[i][j] = &e.P
+	if g.directed {
+		return
+	}
 	g.m[j][i] = &e.P
 }
 
@@ -78,6 +81,9 @@ func (g *AdjacencyMatrix[T]) RemoveEdge(e *Edge[T]) {
 		return
 	}
 	g.m[i][j] = nil
+	if g.directed {
+		return
+	}
 	g.m[j][i] = nil
 }
 
