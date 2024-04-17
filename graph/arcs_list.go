@@ -35,6 +35,15 @@ func (g *ArcsList[T]) AddEdge(e *Edge[T]) {
 		return
 	}
 	x, y, p := e.X, e.Y, e.P
+	vs := g.Vertices()
+	iX := indexVertex[T](vs, x)
+	if iX >= 0 {
+		x = vs[iX]
+	}
+	iY := indexVertex[T](vs, y)
+	if iY >= 0 {
+		y = vs[iY]
+	}
 	g.e = append(g.e, &Edge[T]{X: x, Y: y, P: p})
 	if g.directed {
 		return

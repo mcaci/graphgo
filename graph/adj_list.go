@@ -37,11 +37,21 @@ func (g *AdjacencyLists[T]) AddEdge(e *Edge[T]) {
 		}
 		g.l[i].n = append(g.l[i].n, &Neighbour[T]{v: y, p: e.P})
 	}
-	add(e.X, e.Y)
+	x, y := e.X, e.Y
+	vs := g.Vertices()
+	iX := indexVertex[T](vs, x)
+	if iX >= 0 {
+		x = vs[iX]
+	}
+	iY := indexVertex[T](vs, y)
+	if iY >= 0 {
+		y = vs[iY]
+	}
+	add(x, y)
 	if g.directed {
 		return
 	}
-	add(e.Y, e.X)
+	add(y, x)
 }
 
 func (g *AdjacencyLists[T]) RemoveEdge(e *Edge[T]) {
