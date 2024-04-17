@@ -9,9 +9,13 @@ import (
 	"github.com/mcaci/graphgo/test-ticket/internal"
 )
 
+type EdgeWeight int
+
+func (e EdgeWeight) Weight() int { return int(e) }
+
 func TestDistanceInTicketToRide(t *testing.T) {
 	g := graph.New[string](graph.AdjacencyMatrixType, false)
-	vs, es, err := internal.FromCSV(strings.NewReader(strings.Join(internal.TicketToRideUSA, "\n")), func(w int) graph.EdgeProperty { return path.EdgeWeight(w) })
+	vs, es, err := internal.FromCSV(strings.NewReader(strings.Join(internal.TicketToRideUSA, "\n")), func(w int) graph.EdgeProperty { return EdgeWeight(w) })
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -34,7 +38,7 @@ func TestDistanceInTicketToRide(t *testing.T) {
 
 func TestPathInTicketToRide(t *testing.T) {
 	g := graph.New[string](graph.AdjacencyMatrixType, false)
-	vs, es, err := internal.FromCSV(strings.NewReader(strings.Join(internal.TicketToRideUSA, "\n")), func(w int) graph.EdgeProperty { return path.EdgeWeight(w) })
+	vs, es, err := internal.FromCSV(strings.NewReader(strings.Join(internal.TicketToRideUSA, "\n")), func(w int) graph.EdgeProperty { return EdgeWeight(w) })
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -6,25 +6,28 @@ import (
 	"github.com/mcaci/graphgo/graph"
 )
 
-type EdgeWeight int
+type Weighter interface{ Weight() int }
 
 func BellmanFordDist[T comparable](g graph.Graph[T], s *graph.Vertex[T]) map[*graph.Vertex[T]]*Distance[T] {
 	d := make(map[*graph.Vertex[T]]*Distance[T])
 	vs := g.Vertices()
-	for i := range vs {
-		v := vs[i]
+	for _, v := range vs {
 		var dist int
 		if v != s {
 			dist = math.MaxInt
 		}
 		d[v] = &Distance[T]{v: s, u: v, d: dist}
 	}
-	canRelax := func(x, y *graph.Vertex[T], w EdgeWeight) bool { return d[x].d+int(w) < d[y].d && d[x].d+int(w) > 0 }
-	relax := func(x, y *graph.Vertex[T], w EdgeWeight) { d[y].SetDist(int(w) + d[x].d) }
+	canRelax := func(x, y *graph.Vertex[T], w Weighter) bool {
+		return d[x].d+w.Weight() < d[y].d && d[x].d+w.Weight() > 0
+	}
+	relax := func(x, y *graph.Vertex[T], w Weighter) {
+		d[y].SetDist(w.Weight() + d[x].d)
+	}
 	es := g.Edges()
 	for range vs {
 		for _, e := range es {
-			w := e.P.(EdgeWeight)
+			w := e.P.(Weighter)
 			switch {
 			case canRelax(e.X, e.Y, w):
 				relax(e.X, e.Y, w)

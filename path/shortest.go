@@ -8,9 +8,9 @@ func Shortest[T comparable](g graph.Graph[T], d map[*graph.Vertex[T]]*Distance[T
 	}
 	path := []*graph.Vertex[T]{y}
 	v := y
-	isShortestDist := func(u, v *graph.Vertex[T], w EdgeWeight) bool { return d[u].d+int(w) == d[v].d }
+	isShortestDist := func(u, v *graph.Vertex[T], w Weighter) bool { return d[u].d+w.Weight() == d[v].d }
 	es := g.Edges()
-	for i := 0; v != x && i < 10; i++ {
+	for v != x {
 	edges:
 		for _, u := range g.AdjacentNodes(v) {
 			for _, edge := range es {
@@ -18,7 +18,7 @@ func Shortest[T comparable](g graph.Graph[T], d map[*graph.Vertex[T]]*Distance[T
 				case edge.X == u && edge.Y == v,
 					edge.X == v && edge.Y == u:
 
-					if isShortestDist(u, v, edge.P.(EdgeWeight)) {
+					if isShortestDist(u, v, edge.P.(Weighter)) {
 						path = append([]*graph.Vertex[T]{u}, path...)
 						v = u
 						break edges
