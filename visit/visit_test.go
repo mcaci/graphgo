@@ -14,9 +14,7 @@ func TestGenericVisit(t *testing.T) {
 		setup func(int) (graph.Graph[int], *graph.Vertex[int])
 	}{
 		{name: "Empty graph", setup: func(graphType int) (graph.Graph[int], *graph.Vertex[int]) {
-			v := &graph.Vertex[int]{E: 1}
-			g := graph.New[int](graphType, false)
-			return g, v
+			return graph.New[int](graphType, false), &graph.Vertex[int]{E: 1}
 		}},
 		{name: "One vertex graph", setup: func(graphType int) (graph.Graph[int], *graph.Vertex[int]) {
 			v := &graph.Vertex[int]{E: 1}

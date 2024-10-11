@@ -46,6 +46,8 @@ func (t *Tree[T]) Find(e *T) *Tree[T] {
 	}
 }
 
+func (t *Tree[T]) Contains(e *T) bool { return t.Find(e) != nil }
+
 func (t *Tree[T]) String() string {
 	switch {
 	case t == nil, t.element == nil:
