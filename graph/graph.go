@@ -80,22 +80,22 @@ func indexEdge[T comparable](g Graph[T], e *Edge[T]) int {
 }
 
 func Copy[T comparable](g Graph[T]) Graph[T] {
-var o Graph[T]
-switch g.(type) {
-case *ArcsList:
-		o = &ArcsList[T]{directed: g.isDirected}
-	case *AdjacencyLists:
-		o = &AdjacencyLists[T]{directed: g.isDirected}
-	case *AdjacencyMatrix:
-		o = &AdjacencyMatrix[T]{directed: g.isDirected}
-default:
-  o = &ArcsList[T]{directed: g.isDirected}
-}
-                for _, v := range g.Vertices() {
-                        o.AddVertex(v)
-                }
-                for _, e := range g.Edges() {
-                        o.AddEdge(e)
-                }
-return o
+	var o Graph[T]
+	switch g.(type) {
+	case *ArcsList[T]:
+		o = &ArcsList[T]{directed: g.IsDirected()}
+	case *AdjacencyLists[T]:
+		o = &AdjacencyLists[T]{directed: g.IsDirected()}
+	case *AdjacencyMatrix[T]:
+		o = &AdjacencyMatrix[T]{directed: g.IsDirected()}
+	default:
+		o = &ArcsList[T]{directed: g.IsDirected()}
+	}
+	for _, v := range g.Vertices() {
+		o.AddVertex(v)
+	}
+	for _, e := range g.Edges() {
+		o.AddEdge(e)
+	}
+	return o
 }
