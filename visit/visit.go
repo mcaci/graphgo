@@ -8,6 +8,9 @@ func Generic[T comparable](g graph.Graph[T], s *graph.Vertex[T]) *Tree[T] {
 	if !g.ContainsVertex(s) {
 		return nil
 	}
+	for _, v := range g.Vertices() {
+		v.Unvisit()
+	}
 	s.Visit()
 	t := &Tree[T]{element: &s.E}
 	f := []*graph.Vertex[T]{s}

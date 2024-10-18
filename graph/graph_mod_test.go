@@ -221,7 +221,7 @@ func TestGenericGraphModificationOperation(t *testing.T) {
 			t.Run(tc.name+strconv.Itoa(i), func(t *testing.T) {
 				g := tc.setup(i)
 				if !tc.ok(g) {
-					t.Fatalf(tc.errMsg(g))
+					t.Fatal(tc.errMsg(g))
 				}
 			})
 		}
