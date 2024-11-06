@@ -2,6 +2,7 @@ package visit
 
 import (
 	"fmt"
+	"slices"
 	"strings"
 )
 
@@ -34,15 +35,11 @@ func (t *Tree[T]) Find(e *T) *Tree[T] {
 	case t.children == nil:
 		return nil
 	default:
-		var tree *Tree[T]
-		for i := range t.children {
-			tree = t.children[i].Find(e)
-			if tree == nil {
-				continue
-			}
-			return tree
+		i := slices.IndexFunc(t.children, func(t *Tree[T]) bool { return t.Find(e) != nil })
+		if i < 0 {
+			return nil
 		}
-		return nil
+		return t.children[i]
 	}
 }
 
