@@ -41,6 +41,19 @@ func New[T comparable](graphType int, isDirected bool) Graph[T] {
 	}
 }
 
+func NewUndirected[T comparable](graphType int) Graph[T] {
+	switch graphType {
+	case ArcsListType:
+		return &ArcsList[T]{}
+	case AdjacencyListType:
+		return &AdjacencyLists[T]{}
+	case AdjacencyMatrixType:
+		return &AdjacencyMatrix[T]{}
+	default:
+		return &ArcsList[T]{}
+	}
+}
+
 func Fill[T comparable](vs []*Vertex[T], es []*Edge[T], into Graph[T]) {
 	for _, v := range vs {
 		if into.ContainsVertex(v) {
